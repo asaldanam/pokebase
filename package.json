@@ -9,8 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "ag-grid-community": "^34.2.0",
-    "ag-grid-enterprise": "^34.2.0",
-    "astro": "^5.13.7"
+    "@apollo/client": "4.0.5",
+    "ag-grid-community": "34.2.0",
+    "ag-grid-enterprise": "34.2.0",
+    "astro": "5.13.7",
+    "graphql": "16.11.0"
   }
 }

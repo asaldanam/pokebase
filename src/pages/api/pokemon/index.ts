@@ -1,11 +1,11 @@
+import PokeApi from '@services/PokeApi';
 import type { APIRoute } from 'astro';
-import { PokeApi } from '../../../services/PokeApi';
 
 export const GET: APIRoute = async () => {
     try {
-        const result = await PokeApi.pokemon();
+        const result = await PokeApi.GetPokemon();
 
-        return new Response(JSON.stringify(result.data), {
+        return new Response(JSON.stringify(result.data?.pokemon), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json'

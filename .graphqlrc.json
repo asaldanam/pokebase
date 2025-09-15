@@ -1,0 +1,21 @@
+{
+    "name": "PokeAPI GraphQL",
+    "schemaPath": "https://graphql.pokeapi.co/v1beta2/",
+    "extensions": {
+        "endpoints": {
+            "Default": {
+                "url": "https://graphql.pokeapi.co/v1beta2/",
+                "headers": {
+                    "user-agent": "VS Code GraphQL"
+                },
+                "introspect": true
+            }
+        }
+    },
+    "includes": [
+        "src/**/*.{ts,tsx,js,jsx,graphql,gql}"
+    ],
+    "excludes": [
+        "node_modules/**/*"
+    ]
+}

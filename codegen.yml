@@ -1,0 +1,16 @@
+overwrite: true
+schema: "https://graphql.pokeapi.co/v1beta2/"
+documents: "src/**/*.{ts,tsx,astro}"
+generates:
+  src/services/PokeApi/types/PokeApiTypes.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      avoidOptionals: false
+      maybeValue: T | null | undefined
+      inputMaybeValue: T | null | undefined
+      withHooks: true
+      withComponent: false
+      withHOC: false

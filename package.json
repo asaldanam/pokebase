@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "@apollo/client": "4.0.5",
@@ -14,5 +15,12 @@
     "ag-grid-enterprise": "34.2.0",
     "astro": "5.13.7",
     "graphql": "16.11.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "6.0.0",
+    "@graphql-codegen/typescript": "5.0.0",
+    "@graphql-codegen/typescript-apollo-client-helpers": "3.0.1",
+    "@graphql-codegen/typescript-operations": "5.0.0",
+    "@graphql-codegen/typescript-react-apollo": "4.3.3"
   }
 }

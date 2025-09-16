@@ -6,8 +6,8 @@ import type { GetPokemonQuery, GetPokemonQueryVariables } from '../types/PokeApi
 
 // Query con nombre para generar tipos específicos
 export const GET_POKEMON_BY_ID = gql`
-    query GetPokemon($gen: String = "generation-ix") {
-        results: pokemon {
+    query GetPokemon($gen: Int = 9) {
+        results: pokemon(where: { pokemonmoves: { versiongroup: { generation: { id: { _eq: $gen } } } } }) {
             id
             name
             pokemonstats {
@@ -23,7 +23,7 @@ export const GET_POKEMON_BY_ID = gql`
                     name
                 }
             }
-            pokemonmoves(where: { versiongroup: { generation: { name: { _eq: $gen } } } }) {
+            pokemonmoves(where: { versiongroup: { generation: { id: { _eq: $gen } } } }) {
                 movelearnmethod {
                     name
                 }
@@ -36,10 +36,12 @@ export const GET_POKEMON_BY_ID = gql`
     }
 `;
 
-export const GetPokemon = async (params?: { lang?: string }) => {
+export const GetPokemon = async (params?: { lang?: string; gen?: number }) => {
+    const { gen = 9, lang = 'en' } = params || {};
+
     const response = await PokeApiClient.query<GetPokemonQuery, GetPokemonQueryVariables>({
         query: GET_POKEMON_BY_ID,
-        variables: {},
+        variables: { gen },
         errorPolicy: 'all'
     });
 

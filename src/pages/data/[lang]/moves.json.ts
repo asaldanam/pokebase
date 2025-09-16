@@ -1,14 +1,25 @@
 import PokeApi from '@services/PokeApi';
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async () => {
+export async function getStaticPaths() {
+    return [
+        //
+        // Pre-render for all supported languages
+        { params: { lang: 'en' } },
+        { params: { lang: 'es' } }
+    ];
+}
+
+export const GET: APIRoute = async ({ params }) => {
     try {
-        const pokemon = await PokeApi.GetPokemon();
+        const { lang } = params;
+        const pokemon = await PokeApi.GetMoves({ lang });
 
         return new Response(JSON.stringify(pokemon), {
             status: 200,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Cache-Control': 'public, max-age=86400'
             }
         });
     } catch (error: any) {

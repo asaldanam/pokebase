@@ -1,4 +1,3 @@
-export * from 'ag-grid-community';
 export * from 'ag-grid-enterprise';
 
 (() => {

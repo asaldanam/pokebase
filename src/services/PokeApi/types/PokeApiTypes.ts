@@ -49395,15 +49395,15 @@ export type Versionname_Variance_Order_By = {
 };
 
 export type GetMovesQueryVariables = Exact<{
-  lang?: InputMaybe<Scalars['String']['input']>;
-  gen?: InputMaybe<Scalars['String']['input']>;
+  lang: Scalars['String']['input'];
+  gen?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
 export type GetMovesQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'move', id: number, name: string, power?: number | null | undefined, pp?: number | null | undefined, accuracy?: number | null | undefined, movenames: Array<{ __typename?: 'movename', name: string, language?: { __typename?: 'language', name: string } | null | undefined }>, moveflavortexts: Array<{ __typename?: 'moveflavortext', flavor_text: string }>, movedamageclass?: { __typename?: 'movedamageclass', id: number, name: string } | null | undefined, type?: { __typename?: 'type', id: number, name: string } | null | undefined, movemeta: Array<{ __typename?: 'movemeta', crit_rate?: number | null | undefined, drain?: number | null | undefined, flinch_chance?: number | null | undefined, healing?: number | null | undefined, max_hits?: number | null | undefined, max_turns?: number | null | undefined, min_hits?: number | null | undefined, min_turns?: number | null | undefined }>, machines: Array<{ __typename?: 'machine', machine_number: number }> }> };
 
 export type GetPokemonQueryVariables = Exact<{
-  gen?: InputMaybe<Scalars['String']['input']>;
+  gen?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
@@ -49418,7 +49418,7 @@ export type GetPokemonCountQuery = { __typename?: 'query_root', pokemon_aggregat
 
 
 export const GetMovesDocument = gql`
-    query GetMoves($lang: String = "en", $gen: String = "generation-ix") {
+    query GetMoves($lang: String!, $gen: Int) {
   results: move {
     id
     name
@@ -49452,7 +49452,7 @@ export const GetMovesDocument = gql`
       min_hits
       min_turns
     }
-    machines(where: {versiongroup: {generation: {name: {_eq: $gen}}}}) {
+    machines(where: {versiongroup: {generation: {id: {_eq: $gen}}}}) {
       machine_number
     }
   }
@@ -49476,7 +49476,7 @@ export const GetMovesDocument = gql`
  *   },
  * });
  */
-export function useGetMovesQuery(baseOptions?: Apollo.QueryHookOptions<GetMovesQuery, GetMovesQueryVariables>) {
+export function useGetMovesQuery(baseOptions: Apollo.QueryHookOptions<GetMovesQuery, GetMovesQueryVariables> & ({ variables: GetMovesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetMovesQuery, GetMovesQueryVariables>(GetMovesDocument, options);
       }
@@ -49493,8 +49493,10 @@ export type GetMovesLazyQueryHookResult = ReturnType<typeof useGetMovesLazyQuery
 export type GetMovesSuspenseQueryHookResult = ReturnType<typeof useGetMovesSuspenseQuery>;
 export type GetMovesQueryResult = Apollo.QueryResult<GetMovesQuery, GetMovesQueryVariables>;
 export const GetPokemonDocument = gql`
-    query GetPokemon($gen: String = "generation-ix") {
-  results: pokemon {
+    query GetPokemon($gen: Int = 9) {
+  results: pokemon(
+    where: {pokemonmoves: {versiongroup: {generation: {id: {_eq: $gen}}}}}
+  ) {
     id
     name
     pokemonstats {
@@ -49510,7 +49512,7 @@ export const GetPokemonDocument = gql`
         name
       }
     }
-    pokemonmoves(where: {versiongroup: {generation: {name: {_eq: $gen}}}}) {
+    pokemonmoves(where: {versiongroup: {generation: {id: {_eq: $gen}}}}) {
       movelearnmethod {
         name
       }

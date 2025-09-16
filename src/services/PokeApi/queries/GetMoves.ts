@@ -6,7 +6,7 @@ import type { GetMovesQuery, GetMovesQueryVariables } from '../types/PokeApiType
 
 // Query con nombre para generar tipos específicos
 export const GET_MOVES = gql`
-    query GetMoves($lang: String = "en", $gen: String = "generation-ix") {
+    query GetMoves($lang: String = "en", $gen: Int) {
         results: move {
             id
             name
@@ -40,18 +40,18 @@ export const GET_MOVES = gql`
                 min_hits
                 min_turns
             }
-            machines(where: { versiongroup: { generation: { name: { _eq: $gen } } } }) {
+            machines(where: { versiongroup: { generation: { id: { _eq: $gen } } } }) {
                 machine_number
             }
         }
     }
 `;
 
-export const GetMoves = async (params: { lang?: string }) => {
-    const { lang = 'en' } = params;
+export const GetMoves = async (params: { lang?: string; gen?: number }) => {
+    const { lang = 'en', gen = 9 } = params;
     const response = await PokeApiClient.query<GetMovesQuery, GetMovesQueryVariables>({
         query: GET_MOVES,
-        variables: { lang },
+        variables: { lang, gen },
         errorPolicy: 'all'
     });
 

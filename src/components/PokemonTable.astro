@@ -1,0 +1,127 @@
+---
+// Componente para la tabla de Pokemon usando AG Grid
+---
+
+<div id="PokemonTable" style="height: 100%; width: 100%;"></div>
+
+<script>
+	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';
+	import type { Pokemon, Move, Stat } from '@services/PokeApi';
+	import {
+		ClientSideRowModelModule,
+		createGrid,
+		DateFilterModule,
+		ModuleRegistry,
+		NumberFilterModule,
+		TextFilterModule,
+		ValidationModule,
+		type ColDef,
+		type Column,
+		type GridOptions
+	} from 'ag-grid-community';
+
+	type Row = Omit<Pokemon, 'moves'> & { moves: Move[] } & {};
+
+	if (typeof window !== 'undefined') {
+		ModuleRegistry.registerModules([
+			ClientSideRowModelModule,
+			TreeDataModule,
+			AdvancedFilterModule,
+			MultiFilterModule,
+			SetFilterModule,
+			TextFilterModule,
+			NumberFilterModule,
+			DateFilterModule,
+			...(process.env.NODE_ENV !== 'production' ? [ValidationModule] : [])
+		]);
+
+		const lang = navigator.language.split('-')[0] || 'en';
+
+		const [pokemon, moves, stats] = await Promise.all([
+			fetch(`/data/${lang}/pokemon.json`).then((res) => res.json()) as Promise<Pokemon[]>,
+			fetch(`/data/${lang}/moves.json`).then((res) => res.json()) as Promise<Move[]>,
+			fetch(`/data/${lang}/stats.json`).then((res) => res.json()) as Promise<Record<string, Stat>>
+		]);
+
+		const rows: Row[] = (pokemon as Pokemon[]).map((pokemon: Pokemon) => ({
+			...pokemon,
+			moves: pokemon.moves.map((move) => moves[move.id])
+		}));
+
+		createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
+			columnDefs: [
+				// Pokemon
+				{
+					field: 'id',
+					pinned: true,
+					maxWidth: 80,
+					minWidth: 80,
+					filter: false,
+					valueFormatter: ({ value }) => `#${value.toString().padStart(4, '0')}`
+				},
+				{
+					pinned: true,
+					field: 'name',
+					filter: 'agTextColumnFilter',
+					floatingFilter: true,
+					maxWidth: 200,
+					minWidth: 80,
+					valueFormatter: ({ value }) => value.charAt(0).toUpperCase() + value.slice(1)
+				},
+
+				// Types
+				{
+					field: 'types',
+					filter: 'agSetColumnFilter',
+					floatingFilter: true
+				},
+
+				// Stats
+				// ...Array.from({ length: 6 }, (_, i) => i + 1).map(
+				// 	(i) =>
+				// 		({
+				// 			field: `stats.${i}`,
+				// 			headerName: `${stats[i]?.name || `Stat ${i}`}`,
+				// 			filter: 'agNumberColumnFilter',
+				// 			floatingFilter: true
+				// 		}) as ColDef<Row>
+				// ),
+				{
+					field: 'stats',
+					wrapHeaderText: true,
+					children: Array.from({ length: 6 }, (_, i) => i + 1).map(
+						(i) =>
+							({
+								field: `stats.${i}`,
+								headerName: `${stats[i]?.name || `Stat ${i}`}`,
+								filter: 'agNumberColumnFilter',
+								floatingFilter: true,
+								maxWidth: 120
+							}) as ColDef<Row>
+					)
+				},
+
+				// Moves
+				{
+					field: 'moves',
+					filter: 'agTextColumnFilter',
+					floatingFilter: true,
+					valueFormatter: ({ context, value }) => {
+						return value.length;
+					},
+					filterValueGetter: ({ data }) => {
+						return data?.moves.map((move) => move.name).join(', ');
+					}
+				}
+			],
+			defaultColDef: {
+				flex: 1
+			},
+			rowData: rows,
+			groupDefaultExpanded: -1
+			// enableAdvancedFilter: true
+			// treeData: true,
+			// getDataPath: (data) => data.path
+		});
+	}
+</script>

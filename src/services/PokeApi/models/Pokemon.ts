@@ -1,4 +1,4 @@
-import type { GetPokemonByIdQuery } from '../types/PokeApiTypes';
+import type { GetPokemonQuery } from '../types/PokeApiTypes';
 
 export class Pokemon {
     id!: number;
@@ -11,7 +11,7 @@ export class Pokemon {
         Object.assign(this, params);
     }
 
-    static fromQuery(data: GetPokemonByIdQuery['results'][0]) {
+    static fromQuery(data: GetPokemonQuery['results'][0]) {
         return new Pokemon({
             id: data.id,
             name: data.name,

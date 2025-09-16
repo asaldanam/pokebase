@@ -49402,13 +49402,12 @@ export type GetMovesQueryVariables = Exact<{
 
 export type GetMovesQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'move', id: number, name: string, power?: number | null | undefined, pp?: number | null | undefined, accuracy?: number | null | undefined, movenames: Array<{ __typename?: 'movename', name: string, language?: { __typename?: 'language', name: string } | null | undefined }>, moveflavortexts: Array<{ __typename?: 'moveflavortext', flavor_text: string }>, movedamageclass?: { __typename?: 'movedamageclass', id: number, name: string } | null | undefined, type?: { __typename?: 'type', id: number, name: string } | null | undefined, movemeta: Array<{ __typename?: 'movemeta', crit_rate?: number | null | undefined, drain?: number | null | undefined, flinch_chance?: number | null | undefined, healing?: number | null | undefined, max_hits?: number | null | undefined, max_turns?: number | null | undefined, min_hits?: number | null | undefined, min_turns?: number | null | undefined }>, machines: Array<{ __typename?: 'machine', machine_number: number }> }> };
 
-export type GetPokemonByIdQueryVariables = Exact<{
-  id?: InputMaybe<Scalars['Int']['input']>;
+export type GetPokemonQueryVariables = Exact<{
   gen?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetPokemonByIdQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'pokemon', id: number, name: string, pokemonstats: Array<{ __typename?: 'pokemonstat', base_stat: number, stat?: { __typename?: 'stat', id: number, name: string } | null | undefined }>, pokemontypes: Array<{ __typename?: 'pokemontype', type?: { __typename?: 'type', id: number, name: string } | null | undefined }>, pokemonmoves: Array<{ __typename?: 'pokemonmove', level: number, movelearnmethod?: { __typename?: 'movelearnmethod', name: string } | null | undefined, move?: { __typename?: 'move', id: number } | null | undefined }> }> };
+export type GetPokemonQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'pokemon', id: number, name: string, pokemonstats: Array<{ __typename?: 'pokemonstat', base_stat: number, stat?: { __typename?: 'stat', id: number, name: string } | null | undefined }>, pokemontypes: Array<{ __typename?: 'pokemontype', type?: { __typename?: 'type', id: number, name: string } | null | undefined }>, pokemonmoves: Array<{ __typename?: 'pokemonmove', level: number, movelearnmethod?: { __typename?: 'movelearnmethod', name: string } | null | undefined, move?: { __typename?: 'move', id: number } | null | undefined }> }> };
 
 export type GetPokemonCountQueryVariables = Exact<{
   where?: InputMaybe<Pokemon_Bool_Exp>;
@@ -49493,9 +49492,9 @@ export type GetMovesQueryHookResult = ReturnType<typeof useGetMovesQuery>;
 export type GetMovesLazyQueryHookResult = ReturnType<typeof useGetMovesLazyQuery>;
 export type GetMovesSuspenseQueryHookResult = ReturnType<typeof useGetMovesSuspenseQuery>;
 export type GetMovesQueryResult = Apollo.QueryResult<GetMovesQuery, GetMovesQueryVariables>;
-export const GetPokemonByIdDocument = gql`
-    query GetPokemonById($id: Int, $gen: String = "generation-ix") {
-  results: pokemon(where: {id: {_eq: $id}}) {
+export const GetPokemonDocument = gql`
+    query GetPokemon($gen: String = "generation-ix") {
+  results: pokemon {
     id
     name
     pokemonstats {
@@ -49525,38 +49524,37 @@ export const GetPokemonByIdDocument = gql`
     `;
 
 /**
- * __useGetPokemonByIdQuery__
+ * __useGetPokemonQuery__
  *
- * To run a query within a React component, call `useGetPokemonByIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetPokemonByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetPokemonQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPokemonQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetPokemonByIdQuery({
+ * const { data, loading, error } = useGetPokemonQuery({
  *   variables: {
- *      id: // value for 'id'
  *      gen: // value for 'gen'
  *   },
  * });
  */
-export function useGetPokemonByIdQuery(baseOptions?: Apollo.QueryHookOptions<GetPokemonByIdQuery, GetPokemonByIdQueryVariables>) {
+export function useGetPokemonQuery(baseOptions?: Apollo.QueryHookOptions<GetPokemonQuery, GetPokemonQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetPokemonByIdQuery, GetPokemonByIdQueryVariables>(GetPokemonByIdDocument, options);
+        return Apollo.useQuery<GetPokemonQuery, GetPokemonQueryVariables>(GetPokemonDocument, options);
       }
-export function useGetPokemonByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPokemonByIdQuery, GetPokemonByIdQueryVariables>) {
+export function useGetPokemonLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPokemonQuery, GetPokemonQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetPokemonByIdQuery, GetPokemonByIdQueryVariables>(GetPokemonByIdDocument, options);
+          return Apollo.useLazyQuery<GetPokemonQuery, GetPokemonQueryVariables>(GetPokemonDocument, options);
         }
-export function useGetPokemonByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetPokemonByIdQuery, GetPokemonByIdQueryVariables>) {
+export function useGetPokemonSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetPokemonQuery, GetPokemonQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetPokemonByIdQuery, GetPokemonByIdQueryVariables>(GetPokemonByIdDocument, options);
+          return Apollo.useSuspenseQuery<GetPokemonQuery, GetPokemonQueryVariables>(GetPokemonDocument, options);
         }
-export type GetPokemonByIdQueryHookResult = ReturnType<typeof useGetPokemonByIdQuery>;
-export type GetPokemonByIdLazyQueryHookResult = ReturnType<typeof useGetPokemonByIdLazyQuery>;
-export type GetPokemonByIdSuspenseQueryHookResult = ReturnType<typeof useGetPokemonByIdSuspenseQuery>;
-export type GetPokemonByIdQueryResult = Apollo.QueryResult<GetPokemonByIdQuery, GetPokemonByIdQueryVariables>;
+export type GetPokemonQueryHookResult = ReturnType<typeof useGetPokemonQuery>;
+export type GetPokemonLazyQueryHookResult = ReturnType<typeof useGetPokemonLazyQuery>;
+export type GetPokemonSuspenseQueryHookResult = ReturnType<typeof useGetPokemonSuspenseQuery>;
+export type GetPokemonQueryResult = Apollo.QueryResult<GetPokemonQuery, GetPokemonQueryVariables>;
 export const GetPokemonCountDocument = gql`
     query GetPokemonCount($where: pokemon_bool_exp) {
   pokemon_aggregate(where: $where) {

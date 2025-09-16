@@ -1,9 +1,9 @@
 import { GetMoves } from './queries/GetMoves';
-import { GetPokemonById } from './queries/GetPokemonById';
+import { GetPokemon } from './queries/GetPokemon';
 import { GetPokemonCount } from './queries/GetPokemonCount';
 
 export default {
-    GetPokemonById,
+    GetPokemon,
     GetPokemonCount,
     GetMoves
 };

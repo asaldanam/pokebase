@@ -6,7 +6,7 @@
 
 <script>
 	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';
-	import type { Pokemon, Move, Stat } from '@services/PokeApi';
+	import type { Pokemon, Move, Stat, Type } from '@services/PokeApi';
 	import {
 		ClientSideRowModelModule,
 		createGrid,
@@ -37,10 +37,13 @@
 
 		const lang = navigator.language.split('-')[0] || 'en';
 
-		const [pokemon, moves, stats] = await Promise.all([
-			fetch(`/data/${lang}/pokemon.json`).then((res) => res.json()) as Promise<Pokemon[]>,
-			fetch(`/data/${lang}/moves.json`).then((res) => res.json()) as Promise<Move[]>,
-			fetch(`/data/${lang}/stats.json`).then((res) => res.json()) as Promise<Record<string, Stat>>
+		const request = (path: string) => fetch(`/data/${lang}${path}`).then((res) => res.json());
+
+		const [pokemon, moves, stats, types] = await Promise.all([
+			request(`/pokemon.json`) as Promise<Pokemon[]>,
+			request(`/moves.json`) as Promise<Move[]>,
+			request(`/stats.json`) as Promise<Record<string, Stat>>,
+			request(`/types.json`) as Promise<Record<string, Type>>
 		]);
 
 		const rows: Row[] = (pokemon as Pokemon[]).map((pokemon: Pokemon) => ({
@@ -78,7 +81,9 @@
 						{
 							field: 'types',
 							filter: 'agSetColumnFilter',
-							floatingFilter: true
+							floatingFilter: true,
+							valueFormatter: ({ value }) => value.map((typeId: number) => types[typeId].name),
+							filterValueGetter: ({ data }) => data?.types.map((typeId: number) => types[typeId].name)
 						}
 					]
 				},

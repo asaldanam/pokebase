@@ -4,7 +4,7 @@ import { Stat } from './Stat';
 export class Pokemon {
     id!: number;
     name!: string;
-    types!: (number | undefined)[];
+    types!: number[];
     stats!: Record<string, number>;
     moves!: { id: number; learn: { method: string; level?: number } }[];
 
@@ -21,7 +21,7 @@ export class Pokemon {
         return new Pokemon({
             id: data.id,
             name: data.name,
-            types: data.pokemontypes.map((t) => t.type?.id),
+            types: data.pokemontypes.map((t) => t.type!.id),
             stats: {
                 total: Object.values(stats).reduce((a, b) => a + b, 0), // total
                 ...stats

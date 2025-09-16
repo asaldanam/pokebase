@@ -49395,7 +49395,7 @@ export type Versionname_Variance_Order_By = {
 };
 
 export type GetMovesQueryVariables = Exact<{
-  lang: Scalars['String']['input'];
+  lang?: InputMaybe<Scalars['String']['input']>;
   gen?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
@@ -49416,9 +49416,16 @@ export type GetPokemonCountQueryVariables = Exact<{
 
 export type GetPokemonCountQuery = { __typename?: 'query_root', pokemon_aggregate: { __typename?: 'pokemon_aggregate', aggregate?: { __typename?: 'pokemon_aggregate_fields', count: number } | null | undefined } };
 
+export type GetTypesQueryVariables = Exact<{
+  lang?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetTypesQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'type', id: number, typenames: Array<{ __typename?: 'typename', name: string, language?: { __typename?: 'language', name: string } | null | undefined }>, typeefficacies: Array<{ __typename?: 'typeefficacy', target_type_id?: number | null | undefined, damage_factor: number }> }> };
+
 
 export const GetMovesDocument = gql`
-    query GetMoves($lang: String!, $gen: Int) {
+    query GetMoves($lang: String = "en", $gen: Int) {
   results: move {
     id
     name
@@ -49476,7 +49483,7 @@ export const GetMovesDocument = gql`
  *   },
  * });
  */
-export function useGetMovesQuery(baseOptions: Apollo.QueryHookOptions<GetMovesQuery, GetMovesQueryVariables> & ({ variables: GetMovesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetMovesQuery(baseOptions?: Apollo.QueryHookOptions<GetMovesQuery, GetMovesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetMovesQuery, GetMovesQueryVariables>(GetMovesDocument, options);
       }
@@ -49599,3 +49606,53 @@ export type GetPokemonCountQueryHookResult = ReturnType<typeof useGetPokemonCoun
 export type GetPokemonCountLazyQueryHookResult = ReturnType<typeof useGetPokemonCountLazyQuery>;
 export type GetPokemonCountSuspenseQueryHookResult = ReturnType<typeof useGetPokemonCountSuspenseQuery>;
 export type GetPokemonCountQueryResult = Apollo.QueryResult<GetPokemonCountQuery, GetPokemonCountQueryVariables>;
+export const GetTypesDocument = gql`
+    query GetTypes($lang: String = "es") {
+  results: type {
+    id
+    typenames(where: {language: {name: {_in: [$lang, "en"]}}}) {
+      name
+      language {
+        name
+      }
+    }
+    typeefficacies {
+      target_type_id
+      damage_factor
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetTypesQuery__
+ *
+ * To run a query within a React component, call `useGetTypesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTypesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTypesQuery({
+ *   variables: {
+ *      lang: // value for 'lang'
+ *   },
+ * });
+ */
+export function useGetTypesQuery(baseOptions?: Apollo.QueryHookOptions<GetTypesQuery, GetTypesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTypesQuery, GetTypesQueryVariables>(GetTypesDocument, options);
+      }
+export function useGetTypesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTypesQuery, GetTypesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTypesQuery, GetTypesQueryVariables>(GetTypesDocument, options);
+        }
+export function useGetTypesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTypesQuery, GetTypesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetTypesQuery, GetTypesQueryVariables>(GetTypesDocument, options);
+        }
+export type GetTypesQueryHookResult = ReturnType<typeof useGetTypesQuery>;
+export type GetTypesLazyQueryHookResult = ReturnType<typeof useGetTypesLazyQuery>;
+export type GetTypesSuspenseQueryHookResult = ReturnType<typeof useGetTypesSuspenseQuery>;
+export type GetTypesQueryResult = Apollo.QueryResult<GetTypesQuery, GetTypesQueryVariables>;

@@ -54,8 +54,8 @@
 				{
 					field: 'id',
 					pinned: true,
-					maxWidth: 80,
-					minWidth: 80,
+					maxWidth: 100,
+					minWidth: 100,
 					filter: false,
 					valueFormatter: ({ value }) => `#${value.toString().padStart(4, '0')}`
 				},
@@ -73,7 +73,14 @@
 				{
 					field: 'types',
 					filter: 'agSetColumnFilter',
-					floatingFilter: true
+					floatingFilter: true,
+					children: [
+						{
+							field: 'types',
+							filter: 'agSetColumnFilter',
+							floatingFilter: true
+						}
+					]
 				},
 
 				// Stats
@@ -89,16 +96,27 @@
 				{
 					field: 'stats',
 					wrapHeaderText: true,
-					children: Array.from({ length: 6 }, (_, i) => i + 1).map(
-						(i) =>
-							({
-								field: `stats.${i}`,
-								headerName: `${stats[i]?.name || `Stat ${i}`}`,
-								filter: 'agNumberColumnFilter',
-								floatingFilter: true,
-								maxWidth: 120
-							}) as ColDef<Row>
-					)
+					children: [
+						{
+							field: 'stats.total',
+							headerName: 'Total',
+							columnGroupShow: 'closed',
+							filter: 'agNumberColumnFilter',
+							floatingFilter: true,
+							maxWidth: 120
+						},
+						...Array.from({ length: 6 }, (_, i) => i + 1).map(
+							(i) =>
+								({
+									field: `stats.${i}`,
+									headerName: `${stats[i]?.name || `Stat ${i}`}`,
+									columnGroupShow: 'open',
+									filter: 'agNumberColumnFilter',
+									floatingFilter: true,
+									maxWidth: 120
+								}) as ColDef<Row>
+						)
+					]
 				},
 
 				// Moves
@@ -107,7 +125,8 @@
 					filter: 'agTextColumnFilter',
 					floatingFilter: true,
 					valueFormatter: ({ context, value }) => {
-						return value.length;
+						const count = value.length;
+						return `${count} move${count !== 1 ? 's' : ''}`;
 					},
 					filterValueGetter: ({ data }) => {
 						return data?.moves.map((move) => move.name).join(', ');

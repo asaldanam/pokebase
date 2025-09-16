@@ -49395,28 +49395,50 @@ export type Versionname_Variance_Order_By = {
 };
 
 export type GetPokemonQueryVariables = Exact<{
-  limit?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetPokemonQuery = { __typename?: 'query_root', pokemon: Array<{ __typename?: 'pokemon', id: number, name: string, height?: number | null | undefined, weight?: number | null | undefined, base_experience?: number | null | undefined, pokemonmoves: Array<{ __typename?: 'pokemonmove', move?: { __typename?: 'move', id: number, name: string, power?: number | null | undefined, pp?: number | null | undefined, accuracy?: number | null | undefined } | null | undefined }> }> };
+export type GetPokemonQuery = { __typename?: 'query_root', pokemon: Array<{ __typename?: 'pokemon', id: number, name: string, pokemonsprites: Array<{ __typename?: 'pokemonsprites', sprites: any }>, pokemonmoves: Array<{ __typename?: 'pokemonmove', move?: { __typename?: 'move', id: number, name: string, power?: number | null | undefined, pp?: number | null | undefined, accuracy?: number | null | undefined, movenames: Array<{ __typename?: 'movename', name: string, language?: { __typename?: 'language', name: string } | null | undefined }>, moveeffect?: { __typename?: 'moveeffect', moveeffecteffecttexts: Array<{ __typename?: 'moveeffecteffecttext', effect: string, short_effect: string, language?: { __typename?: 'language', name: string } | null | undefined }> } | null | undefined, movedamageclass?: { __typename?: 'movedamageclass', name: string } | null | undefined, type?: { __typename?: 'type', name: string } | null | undefined } | null | undefined }> }> };
 
 
 export const GetPokemonDocument = gql`
-    query GetPokemon($limit: Int = 1) {
-  pokemon: pokemon(limit: $limit) {
+    query GetPokemon($id: Int, $lang: String = "en") {
+  pokemon: pokemon(where: {id: {_eq: $id}}) {
     id
     name
-    height
-    weight
-    base_experience
-    pokemonmoves(limit: 1) {
+    pokemonsprites {
+      sprites(path: "front_default")
+    }
+    pokemonmoves {
       move {
         id
         name
+        movenames(where: {language: {name: {_in: ["en", $lang]}}}) {
+          name
+          language {
+            name
+          }
+        }
+        moveeffect {
+          moveeffecteffecttexts(where: {language: {name: {_in: ["en", $lang]}}}) {
+            effect
+            short_effect
+            language {
+              name
+            }
+          }
+        }
         power
         pp
         accuracy
+        movedamageclass {
+          name
+        }
+        type {
+          name
+        }
       }
     }
   }
@@ -49435,7 +49457,8 @@ export const GetPokemonDocument = gql`
  * @example
  * const { data, loading, error } = useGetPokemonQuery({
  *   variables: {
- *      limit: // value for 'limit'
+ *      id: // value for 'id'
+ *      lang: // value for 'lang'
  *   },
  * });
  */

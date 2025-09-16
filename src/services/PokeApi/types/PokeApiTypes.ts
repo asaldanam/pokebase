@@ -49394,14 +49394,21 @@ export type Versionname_Variance_Order_By = {
   version_id?: InputMaybe<Order_By>;
 };
 
-export type GetPokemonByIdQueryVariables = Exact<{
-  id?: InputMaybe<Scalars['Int']['input']>;
+export type GetMovesQueryVariables = Exact<{
   lang?: InputMaybe<Scalars['String']['input']>;
   gen?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetPokemonByIdQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'pokemon', id: number, name: string, pokemonstats: Array<{ __typename?: 'pokemonstat', base_stat: number, stat?: { __typename?: 'stat', id: number, name: string } | null | undefined }>, pokemontypes: Array<{ __typename?: 'pokemontype', type?: { __typename?: 'type', id: number, name: string } | null | undefined }>, pokemonmoves: Array<{ __typename?: 'pokemonmove', level: number, movelearnmethod?: { __typename?: 'movelearnmethod', name: string } | null | undefined, move?: { __typename?: 'move', id: number, name: string, power?: number | null | undefined, pp?: number | null | undefined, accuracy?: number | null | undefined, movenames: Array<{ __typename?: 'movename', name: string, language?: { __typename?: 'language', name: string } | null | undefined }>, moveflavortexts: Array<{ __typename?: 'moveflavortext', flavor_text: string }>, movedamageclass?: { __typename?: 'movedamageclass', id: number, name: string } | null | undefined, type?: { __typename?: 'type', id: number, name: string } | null | undefined, movemeta: Array<{ __typename?: 'movemeta', crit_rate?: number | null | undefined, drain?: number | null | undefined, flinch_chance?: number | null | undefined, healing?: number | null | undefined, max_hits?: number | null | undefined, max_turns?: number | null | undefined, min_hits?: number | null | undefined, min_turns?: number | null | undefined }>, machines: Array<{ __typename?: 'machine', machine_number: number }> } | null | undefined }> }> };
+export type GetMovesQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'move', id: number, name: string, power?: number | null | undefined, pp?: number | null | undefined, accuracy?: number | null | undefined, movenames: Array<{ __typename?: 'movename', name: string, language?: { __typename?: 'language', name: string } | null | undefined }>, moveflavortexts: Array<{ __typename?: 'moveflavortext', flavor_text: string }>, movedamageclass?: { __typename?: 'movedamageclass', id: number, name: string } | null | undefined, type?: { __typename?: 'type', id: number, name: string } | null | undefined, movemeta: Array<{ __typename?: 'movemeta', crit_rate?: number | null | undefined, drain?: number | null | undefined, flinch_chance?: number | null | undefined, healing?: number | null | undefined, max_hits?: number | null | undefined, max_turns?: number | null | undefined, min_hits?: number | null | undefined, min_turns?: number | null | undefined }>, machines: Array<{ __typename?: 'machine', machine_number: number }> }> };
+
+export type GetPokemonByIdQueryVariables = Exact<{
+  id?: InputMaybe<Scalars['Int']['input']>;
+  gen?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetPokemonByIdQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'pokemon', id: number, name: string, pokemonstats: Array<{ __typename?: 'pokemonstat', base_stat: number, stat?: { __typename?: 'stat', id: number, name: string } | null | undefined }>, pokemontypes: Array<{ __typename?: 'pokemontype', type?: { __typename?: 'type', id: number, name: string } | null | undefined }>, pokemonmoves: Array<{ __typename?: 'pokemonmove', level: number, movelearnmethod?: { __typename?: 'movelearnmethod', name: string } | null | undefined, move?: { __typename?: 'move', id: number } | null | undefined }> }> };
 
 export type GetPokemonCountQueryVariables = Exact<{
   where?: InputMaybe<Pokemon_Bool_Exp>;
@@ -49411,8 +49418,83 @@ export type GetPokemonCountQueryVariables = Exact<{
 export type GetPokemonCountQuery = { __typename?: 'query_root', pokemon_aggregate: { __typename?: 'pokemon_aggregate', aggregate?: { __typename?: 'pokemon_aggregate_fields', count: number } | null | undefined } };
 
 
+export const GetMovesDocument = gql`
+    query GetMoves($lang: String = "en", $gen: String = "generation-ix") {
+  results: move {
+    id
+    name
+    movenames(where: {language: {name: {_in: ["en", $lang]}}}) {
+      name
+      language {
+        name
+      }
+    }
+    moveflavortexts(where: {language: {name: {_eq: $lang}}}) {
+      flavor_text
+    }
+    power
+    pp
+    accuracy
+    movedamageclass {
+      id
+      name
+    }
+    type {
+      id
+      name
+    }
+    movemeta {
+      crit_rate
+      drain
+      flinch_chance
+      healing
+      max_hits
+      max_turns
+      min_hits
+      min_turns
+    }
+    machines(where: {versiongroup: {generation: {name: {_eq: $gen}}}}) {
+      machine_number
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMovesQuery__
+ *
+ * To run a query within a React component, call `useGetMovesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMovesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMovesQuery({
+ *   variables: {
+ *      lang: // value for 'lang'
+ *      gen: // value for 'gen'
+ *   },
+ * });
+ */
+export function useGetMovesQuery(baseOptions?: Apollo.QueryHookOptions<GetMovesQuery, GetMovesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMovesQuery, GetMovesQueryVariables>(GetMovesDocument, options);
+      }
+export function useGetMovesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMovesQuery, GetMovesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMovesQuery, GetMovesQueryVariables>(GetMovesDocument, options);
+        }
+export function useGetMovesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMovesQuery, GetMovesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMovesQuery, GetMovesQueryVariables>(GetMovesDocument, options);
+        }
+export type GetMovesQueryHookResult = ReturnType<typeof useGetMovesQuery>;
+export type GetMovesLazyQueryHookResult = ReturnType<typeof useGetMovesLazyQuery>;
+export type GetMovesSuspenseQueryHookResult = ReturnType<typeof useGetMovesSuspenseQuery>;
+export type GetMovesQueryResult = Apollo.QueryResult<GetMovesQuery, GetMovesQueryVariables>;
 export const GetPokemonByIdDocument = gql`
-    query GetPokemonById($id: Int, $lang: String = "en", $gen: String = "generation-ix") {
+    query GetPokemonById($id: Int, $gen: String = "generation-ix") {
   results: pokemon(where: {id: {_eq: $id}}) {
     id
     name
@@ -49436,40 +49518,6 @@ export const GetPokemonByIdDocument = gql`
       level
       move {
         id
-        name
-        movenames(where: {language: {name: {_in: ["en", $lang]}}}) {
-          name
-          language {
-            name
-          }
-        }
-        moveflavortexts(where: {language: {name: {_eq: $lang}}}) {
-          flavor_text
-        }
-        power
-        pp
-        accuracy
-        movedamageclass {
-          id
-          name
-        }
-        type {
-          id
-          name
-        }
-        movemeta {
-          crit_rate
-          drain
-          flinch_chance
-          healing
-          max_hits
-          max_turns
-          min_hits
-          min_turns
-        }
-        machines(where: {versiongroup: {generation: {name: {_eq: $gen}}}}) {
-          machine_number
-        }
       }
     }
   }
@@ -49489,7 +49537,6 @@ export const GetPokemonByIdDocument = gql`
  * const { data, loading, error } = useGetPokemonByIdQuery({
  *   variables: {
  *      id: // value for 'id'
- *      lang: // value for 'lang'
  *      gen: // value for 'gen'
  *   },
  * });

@@ -75,15 +75,20 @@
 				// Types
 				{
 					field: 'types',
-					filter: 'agSetColumnFilter',
 					floatingFilter: true,
 					children: [
 						{
 							field: 'types',
-							filter: 'agSetColumnFilter',
+							filter: 'agTextColumnFilter',
 							floatingFilter: true,
-							valueFormatter: ({ value }) => value.map((typeId: number) => types[typeId].name),
-							filterValueGetter: ({ data }) => data?.types.map((typeId: number) => types[typeId].name)
+							valueFormatter: ({ value }) => {
+								if (!Array.isArray(value)) return value;
+								return value.map((typeId: number) => types[typeId]?.name || 'Unknown').join(', ');
+							},
+							filterValueGetter: ({ data }) => {
+								if (!data?.types || !Array.isArray(data.types)) return [];
+								return data.types.map((typeId: number) => types[typeId]?.name || 'Unknown');
+							}
 						}
 					]
 				},

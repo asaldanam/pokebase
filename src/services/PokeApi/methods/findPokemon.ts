@@ -6,18 +6,21 @@ import type { GetPokemonQuery, GetPokemonQueryVariables } from '../types/PokeApi
 export const findPokemon = async (params?: { lang?: string; gen?: number }) => {
     const { gen = 9, lang = 'en' } = params || {};
 
-    const response = await PokeApiClient.query<GetPokemonQuery, GetPokemonQueryVariables>({
-        query: GetPokemon,
-        variables: { gen },
-        errorPolicy: 'all'
-    });
+    const query = await Promise.all([
+        await PokeApiClient.query<GetPokemonQuery, GetPokemonQueryVariables>({
+            query: GetPokemon,
+            variables: { gen },
+            errorPolicy: 'all'
+        })
+    ]).then((responses) => ({
+        pokemon: responses[0]
+    }));
 
-    if (response.error) throw new Error(`Error fetching Pokémon: ${response.error.message}`);
-    if (!response.data?.results.length) throw new Error(`No data returned for Pokémon`);
+    if (query.pokemon.error) throw new Error(`Error fetching Pokémon: ${query.pokemon.error.message}`);
+    if (!query.pokemon.data?.results.length) throw new Error(`No data returned for Pokémon`);
 
-    const pokemon = response.data.results.map(Pokemon.fromQuery);
-
-    return pokemon;
+    const result = query.pokemon.data.results.map((pokemon) => Pokemon.fromQuery({ pokemon, types: [] }));
+    return result;
 };
 
 export type FindPokemonResponse = ReturnType<typeof findPokemon>;

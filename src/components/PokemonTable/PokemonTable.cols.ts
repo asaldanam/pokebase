@@ -55,7 +55,7 @@ export function createPokemonTableCols(props: {
                         const icons = typesIds
                             .map(
                                 (id) => /*html*/ `
-                                    <img src="/static/types/${lang}/${id}.png" alt="${id}" style="height: 18px;"/>
+                                    <img src="/pokebase/static/types/${lang}/${id}.png" alt="${id}" style="height: 18px;"/>
                                 `
                             )
                             .join('');
@@ -175,7 +175,7 @@ const createEffectivenessColumn = (props: {
             const icons = typesIds
                 .map(
                     (id) => /*html*/ `
-                        <img src="/static/types/icons/${id}.svg" alt="${id}" style="height: 18px;"/>
+                        <img src="/pokebase/static/types/icons/${id}.svg" alt="${id}" style="height: 18px;"/>
                     `
                 )
                 .join('');

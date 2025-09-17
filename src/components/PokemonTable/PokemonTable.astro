@@ -1,0 +1,50 @@
+---
+// Componente para la tabla de Pokemon usando AG Grid
+---
+
+<div id="PokemonTable" style="height: 100%; width: 100%;"></div>
+
+<script>
+	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';
+	import {
+		ClientSideRowModelModule,
+		createGrid,
+		DateFilterModule,
+		ModuleRegistry,
+		NumberFilterModule,
+		TextFilterModule,
+		ValidationModule
+	} from 'ag-grid-community';
+	import { createPokemonTableCols } from './PokemonTable.cols';
+	import { getPokemonTableData } from './PokemonTable.data';
+
+	if (typeof window !== 'undefined') {
+		ModuleRegistry.registerModules([
+			ClientSideRowModelModule,
+			TreeDataModule,
+			AdvancedFilterModule,
+			MultiFilterModule,
+			SetFilterModule,
+			TextFilterModule,
+			NumberFilterModule,
+			DateFilterModule,
+			...(process.env.NODE_ENV !== 'production' ? [ValidationModule] : [])
+		]);
+
+		const lang = navigator.language.split('-')[0] || 'en';
+
+		const { rows, stats, types } = await getPokemonTableData({ lang });
+
+		createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
+			columnDefs: createPokemonTableCols({ lang, stats, types }),
+			defaultColDef: {
+				flex: 1
+			},
+			rowData: rows,
+			groupDefaultExpanded: -1
+			// enableAdvancedFilter: true
+			// treeData: true,
+			// getDataPath: (data) => data.path
+		});
+	}
+</script>

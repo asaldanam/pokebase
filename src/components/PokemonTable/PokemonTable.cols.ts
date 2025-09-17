@@ -160,8 +160,8 @@ const createEffectivenessColumn = (props: {
         filter: 'agMultiColumnFilter',
         columnGroupShow: 'open',
         floatingFilter: true,
-        minWidth: 130,
-        maxWidth: 130,
+        minWidth: 150,
+        maxWidth: 150,
         //ordena por el número de tipos en esa categoría
         comparator(a, b) {
             return (a?.length || 0) - (b?.length || 0);

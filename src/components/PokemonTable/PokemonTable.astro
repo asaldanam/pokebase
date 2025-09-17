@@ -2,6 +2,15 @@
 // Componente para la tabla de Pokemon usando AG Grid
 ---
 
+<style is:global>
+	.ag-watermark *,
+	.ag-watermark::before {
+		display: none !important;
+		visibility: hidden n !important;
+		opacity: 0 !important;
+	}
+</style>
+
 <div id="PokemonTable" style="height: 100%; width: 100%;"></div>
 
 <script>

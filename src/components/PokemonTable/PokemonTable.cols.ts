@@ -1,7 +1,7 @@
 import type { ColDef, GridOptions } from 'ag-grid-community';
 import type { PokemonTableRow } from './PokemonTable.data';
 import type { FindStatsResponse, FindTypesResponse, Pokemon, Stat, Type } from '@services/PokeApi';
-import type { PokemonTypes } from '@services/PokeApi/models/PokemonTypes';
+import { EffectivenessCategory, type PokemonTypes } from '@services/PokeApi/models/PokemonTypes';
 
 export function createPokemonTableCols(props: {
     lang: string;
@@ -59,6 +59,34 @@ export function createPokemonTableCols(props: {
                             )
                             .join('');
                     }
+                },
+                {
+                    field: 'types.effectiveness',
+                    headerName: 'Effectiveness',
+                    filter: false,
+                    children: Object.values(EffectivenessCategory).map(
+                        (category) =>
+                            ({
+                                field: `types.effectiveness.${category}`,
+                                headerName: category,
+                                filter: 'agMultiColumnFilter',
+                                minWidth: 280,
+                                maxWidth: 280,
+                                //ordena por el número de tipos en esa categoría
+                                comparator(a, b) {
+                                    return (a?.length || 0) - (b?.length || 0);
+                                },
+                                cellRenderer: ({ value }) => {
+                                    const typesIds = value as Array<Type['id']>;
+                                    return typesIds
+                                        .map(
+                                            (id) =>
+                                                `<img src="/static/types/icons/${id}.svg" alt="${id}" style="width: 18px; margin-right: 2px" />`
+                                        )
+                                        .join('');
+                                }
+                            } as ColDef<PokemonTableRow>)
+                    )
                 }
             ]
         },

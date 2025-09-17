@@ -1,10 +1,11 @@
 import type { GetPokemonQuery } from '../types/PokeApiTypes';
+import { PokemonTypes } from './PokemonTypes';
 import { Stat } from './Stat';
 
 export class Pokemon {
     id!: number;
     name!: string;
-    types!: number[];
+    types!: PokemonTypes;
     stats!: Record<string, number>;
     moves!: { id: number; learn: { method: string; level?: number } }[];
 
@@ -21,7 +22,9 @@ export class Pokemon {
         return new Pokemon({
             id: data.id,
             name: data.name,
-            types: data.pokemontypes.map((t) => t.type!.id),
+            types: new PokemonTypes({
+                ids: data.pokemontypes.map((t) => t.type!.id) as PokemonTypes['ids']
+            }),
             stats: {
                 total: Object.values(stats).reduce((a, b) => a + b, 0), // total
                 ...stats

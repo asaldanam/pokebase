@@ -1,6 +1,7 @@
 import type { ColDef, GridOptions } from 'ag-grid-community';
 import type { PokemonTableRow } from './PokemonTable.data';
 import type { FindStatsResponse, FindTypesResponse, Pokemon, Stat, Type } from '@services/PokeApi';
+import type { PokemonTypes } from '@services/PokeApi/models/PokemonTypes';
 
 export function createPokemonTableCols(props: {
     lang: string;
@@ -42,18 +43,19 @@ export function createPokemonTableCols(props: {
                     maxWidth: 280,
                     minWidth: 280,
                     valueFormatter: ({ value }) => {
-                        if (!Array.isArray(value)) return value;
-                        return value.map((typeId: number) => types[typeId]?.name || 'Unknown').join(', ');
+                        const types = value as PokemonTypes;
+                        return types.ids.map((id) => types[id]?.name || 'Unknown').join(', ');
                     },
                     filterValueGetter: ({ data }) => {
-                        if (!data?.types || !Array.isArray(data.types)) return [];
-                        return data.types.map((typeId: number) => types[typeId]?.name || 'Unknown');
+                        if (!data) return '';
+                        return data.types.ids.map((id: number) => types[id].name);
                     },
                     cellRenderer: ({ value }) => {
-                        return value
+                        const types = value as PokemonTypes;
+                        return types.ids
                             .map(
-                                (type) =>
-                                    `<img src="/static/types/${lang}/${type}.png" alt="${type}" style="width: 90px; margin-right: 0.5rem" />`
+                                (id) =>
+                                    `<img src="/static/types/${lang}/${id}.png" alt="${id}" style="width: 90px; margin-right: 0.5rem" />`
                             )
                             .join('');
                     }

@@ -1,18 +1,22 @@
 import type { GetPokemonQuery, GetTypesQuery } from '../types/PokeApiTypes';
 import type { Type } from './Type';
 
-/**
- * Representa la información relativa a los tipos de un Pokemon,
- * incluyendo sus ids y su efectividad combinada contra otros tipos.
- */
+export enum EffectivenessCategory {
+    QUADRUPLE = '4x',
+    DOUBLE = '2x',
+    HALF = '½x',
+    QUARTER = '¼x',
+    IMMUNE = 'immune'
+}
+
 export class PokemonTypes {
     ids!: [Type['id']] | [Type['id'], Type['id']];
     effectiveness!: {
-        '2x': Array<Type['id']>;
-        '4x': Array<Type['id']>;
-        '0.5x': Array<Type['id']>;
-        '0.25x': Array<Type['id']>;
-        immune: Array<Type['id']>;
+        [EffectivenessCategory.QUADRUPLE]: Array<Type['id']>;
+        [EffectivenessCategory.DOUBLE]: Array<Type['id']>;
+        [EffectivenessCategory.HALF]: Array<Type['id']>;
+        [EffectivenessCategory.QUARTER]: Array<Type['id']>;
+        [EffectivenessCategory.IMMUNE]: Array<Type['id']>;
     };
 
     constructor(params: PokemonTypes) {
@@ -24,57 +28,58 @@ export class PokemonTypes {
         types: GetTypesQuery['results'];
     }) {
         const { types, pokemontypes } = params;
-        const typeIds = pokemontypes.map((t) => t.type!.id) as PokemonTypes['ids'];
+        types.sort((a, b) => a.typenames[0].name.localeCompare(b.typenames[0].name));
+        const pokemonTypeIds = pokemontypes.map((t) => t.type!.id) as PokemonTypes['ids'];
 
-        const efficacies = [
-            // Eficacias del primer tipo
-            types[typeIds[0]].typeefficacies,
-            // Eficacias del segundo tipo (si existe)
-            typeIds[1] ? types[typeIds[1]].typeefficacies : null
-        ];
+        // Encontrar los tipos correctos por ID
+        const type1 = types.find((t) => t.id === pokemonTypeIds[0]);
+        const type2 = pokemonTypeIds[1] ? types.find((t) => t.id === pokemonTypeIds[1]) : null;
 
         // Calcular la efectividad combinada para todos los tipos de ataque
         const effectiveness: PokemonTypes['effectiveness'] = {
-            '2x': [],
-            '4x': [],
-            '0.5x': [],
-            '0.25x': [],
-            immune: []
+            [EffectivenessCategory.DOUBLE]: [],
+            [EffectivenessCategory.QUADRUPLE]: [],
+            [EffectivenessCategory.HALF]: [],
+            [EffectivenessCategory.QUARTER]: [],
+            [EffectivenessCategory.IMMUNE]: []
         };
 
-        // Obtener todos los tipos únicos disponibles
-        const allTypeIds = Object.keys(types).map((id) => parseInt(id));
-
         // Para cada tipo de ataque, calcular la efectividad combinada
-        for (const attackingTypeId of allTypeIds) {
-            // Obtener el factor de daño contra el primer tipo
-            const damage1 = efficacies[0]?.find((e) => e.target_type_id === attackingTypeId)?.damage_factor ?? 100;
+        for (const targetType of types) {
+            // Obtenemos las eficacias del tipo objetivo
+            const targetEfficacies = targetType.typeefficacies;
 
-            // Obtener el factor de daño contra el segundo tipo (si existe)
-            const damage2 = typeIds[1]
-                ? efficacies[1]?.find((e) => e.target_type_id === attackingTypeId)?.damage_factor ?? 100
-                : 100;
+            // Se obtienen los factores de daño para cada uno de los tipos del Pokémon
+            const factors = [
+                targetEfficacies.find((e) => e.target_type_id === type1?.id)?.damage_factor,
+                targetEfficacies.find((e) => e.target_type_id === type2?.id)?.damage_factor
+            ];
 
-            // Calcular la efectividad combinada multiplicando los factores
-            // Convertir de escala 0-200 a multiplicador decimal (0, 0.5, 1, 2)
-            const factor1 = damage1 / 100;
-            const factor2 = damage2 / 100;
-            const combinedFactor = factor1 * factor2;
+            // Se obtienen los multiplicadores individuales (por defecto 1x si no hay factor)
+            const firstTypeMultiplier = (factors[0] ?? 100) / 100;
+            const secondTypeMultiplier = (factors[1] ?? 100) / 100;
 
-            // Convertir de vuelta a la escala original para clasificar
-            const multiplier = Math.round(combinedFactor * 100);
+            // Multiplicador combinado
+            const combinedMultiplier = firstTypeMultiplier * secondTypeMultiplier;
 
-            // Clasificar según la efectividad combinada
-            if (multiplier === 0) effectiveness.immune.push(attackingTypeId);
-            if (multiplier === 25) effectiveness['0.25x'].push(attackingTypeId);
-            if (multiplier === 50) effectiveness['0.5x'].push(attackingTypeId);
-            if (multiplier === 200) effectiveness['2x'].push(attackingTypeId);
-            if (multiplier === 400) effectiveness['4x'].push(attackingTypeId);
-            // Los tipos con efectividad 1x (100) no se incluyen en ningún array
+            // Categorías a asignar según el multiplicador combinado
+            const categories = {
+                0: EffectivenessCategory.IMMUNE,
+                0.25: EffectivenessCategory.QUARTER,
+                0.5: EffectivenessCategory.HALF,
+                2: EffectivenessCategory.DOUBLE,
+                4: EffectivenessCategory.QUADRUPLE
+            };
+
+            // Obtenemos la categoría correspondiente
+            const category = categories[combinedMultiplier as keyof typeof categories];
+
+            // Si hay una categoría válida, se añade el tipo objetivo a la lista correspondiente
+            effectiveness[category]?.push(targetType.id);
         }
 
         return new PokemonTypes({
-            ids: typeIds,
+            ids: pokemonTypeIds,
             effectiveness
         });
     }

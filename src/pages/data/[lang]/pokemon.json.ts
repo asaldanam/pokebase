@@ -1,6 +1,8 @@
 import * as PokeApi from '@services/PokeApi';
 import type { APIRoute } from 'astro';
 
+export const prerender = true;
+
 export async function getStaticPaths() {
     return [
         //

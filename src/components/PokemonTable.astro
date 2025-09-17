@@ -75,12 +75,15 @@
 				// Types
 				{
 					field: 'types',
+					openByDefault: true,
 					floatingFilter: true,
 					children: [
 						{
 							field: 'types',
 							filter: 'agTextColumnFilter',
 							floatingFilter: true,
+							maxWidth: 280,
+							minWidth: 280,
 							valueFormatter: ({ value }) => {
 								if (!Array.isArray(value)) return value;
 								return value.map((typeId: number) => types[typeId]?.name || 'Unknown').join(', ');
@@ -88,32 +91,32 @@
 							filterValueGetter: ({ data }) => {
 								if (!data?.types || !Array.isArray(data.types)) return [];
 								return data.types.map((typeId: number) => types[typeId]?.name || 'Unknown');
+							},
+							cellRenderer: ({ value }) => {
+								return value
+									.map(
+										(type) =>
+											`<img src="/static/types/${lang}/${type}.png" alt="${type}" style="width: 90px; margin-right: 0.5rem" />`
+									)
+									.join('');
 							}
 						}
 					]
 				},
 
-				// Stats
-				// ...Array.from({ length: 6 }, (_, i) => i + 1).map(
-				// 	(i) =>
-				// 		({
-				// 			field: `stats.${i}`,
-				// 			headerName: `${stats[i]?.name || `Stat ${i}`}`,
-				// 			filter: 'agNumberColumnFilter',
-				// 			floatingFilter: true
-				// 		}) as ColDef<Row>
-				// ),
 				{
 					field: 'stats',
 					wrapHeaderText: true,
+					openByDefault: true,
 					children: [
 						{
 							field: 'stats.total',
 							headerName: 'Total',
-							columnGroupShow: 'closed',
+							// columnGroupShow: 'closed',
 							filter: 'agNumberColumnFilter',
 							floatingFilter: true,
-							maxWidth: 120
+							minWidth: 180,
+							maxWidth: 180
 						},
 						...Array.from({ length: 6 }, (_, i) => i + 1).map(
 							(i) =>
@@ -123,6 +126,7 @@
 									columnGroupShow: 'open',
 									filter: 'agNumberColumnFilter',
 									floatingFilter: true,
+									minWidth: 120,
 									maxWidth: 120
 								}) as ColDef<Row>
 						)
@@ -140,7 +144,9 @@
 					},
 					filterValueGetter: ({ data }) => {
 						return data?.moves.map((move) => move.name).join(', ');
-					}
+					},
+					minWidth: 280,
+					maxWidth: 280
 				}
 			],
 			defaultColDef: {

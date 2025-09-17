@@ -1,9 +1,13 @@
 import type { GetPokemonQuery, GetTypesQuery } from '../types/PokeApiTypes';
 import type { Type } from './Type';
 
+/**
+ * Representa la información relativa a los tipos de un Pokemon,
+ * incluyendo sus ids y su efectividad combinada contra otros tipos.
+ */
 export class PokemonTypes {
     ids!: [Type['id']] | [Type['id'], Type['id']];
-    effectiveness?: {
+    effectiveness!: {
         '2x': Array<Type['id']>;
         '4x': Array<Type['id']>;
         '0.5x': Array<Type['id']>;
@@ -29,57 +33,49 @@ export class PokemonTypes {
             typeIds[1] ? types[typeIds[1]].typeefficacies : null
         ];
 
-        // Eficacia de los ataques de tipo con id 1 (normal) al primer tipo del pokémon (multiplicador, valores: 0, 50, 100, 200)
-        console.log(efficacies[0]?.find((e) => e.target_type_id === 1)?.damage_factor);
-        // Eficacia de los ataques de tipo con id 1 (normal) al segundo tipo del pokémon (si existe)
-        console.log(efficacies[1]?.find((e) => e.target_type_id === 1)?.damage_factor);
-
-        //TODO:
-        /**
-         * Calcular la "effectiveness" combinadas para los tipos de los pokemon, teniendo en cuenta que:
-         * - Un pokemon puede tener 1 o 2 tipos
-         * - Los factores de daño pueden ser: '2x' (200), '4x' (400), '0.5x' (50), '0.25x' (25), 'immune' (0)
-         * - La eficacia combinada se calcula multiplicando los factores de daño de ambos tipos
-         * - Si un tipo no tiene eficacia contra otro, se considera que el factor de daño es 100 (1x)
-         *
-         * Ejemplo 1:
-         *   Garchomp (tipo 1: dragon, tipo 2: ground)
-         *   - Eficacia de ataques de tipo ice contra el tipo 1 (dragon): 200 (2x)
-         *   - Eficacia de ataques de tipo ice contra el tipo 2 (ground): 200 (2x)
-         *   - Eficacia combinada: 0.5 * 2 = 1x (100)
-         *
-         * Ejemplo 2:
-         *   Dialga (tipo 1: steel, tipo 2: dragon)
-         *   - Eficacia de ataques de tipo grass contra el tipo 1 (steel): 50 (0.5x)
-         *   - Eficacia de ataques de tipo grass contra el tipo 2 (dragon): 50 (0.5x)
-         *   - Eficacia combinada: 0.5 * 0.5 = 0.25x (25)
-         *
-         * Ejemplo 3:
-         *   Zoroark de Hisui (tipo 1: normal, tipo 2: ghost)
-         *  - Eficacia de ataques de tipo fighting contra el tipo 1 (normal): 200 (2x)
-         *  - Eficacia de ataques de tipo fighting contra el tipo 2 (ghost): 0 (immune)
-         *  - Eficacia combinada: 2 * 0 = immune (0)
-         */
+        // Calcular la efectividad combinada para todos los tipos de ataque
         const effectiveness: PokemonTypes['effectiveness'] = {
-            '2x': [
-                // TODO: llenar con los ids de los tipos que son 2x efectivos contra el pokémon
-            ],
-            '4x': [
-                // TODO: llenar con los ids de los tipos que son 4x efectivos contra el pokémon
-            ],
-            '0.5x': [
-                // TODO: llenar con los ids de los tipos que son 0.5x efectivos contra el pokémon
-            ],
-            '0.25x': [
-                // TODO: llenar con los ids de los tipos que son 0.25x efectivos contra el pokémon
-            ],
-            immune: [
-                // TODO: llenar con los ids de los tipos que son immune contra el pokémon
-            ]
+            '2x': [],
+            '4x': [],
+            '0.5x': [],
+            '0.25x': [],
+            immune: []
         };
 
+        // Obtener todos los tipos únicos disponibles
+        const allTypeIds = Object.keys(types).map((id) => parseInt(id));
+
+        // Para cada tipo de ataque, calcular la efectividad combinada
+        for (const attackingTypeId of allTypeIds) {
+            // Obtener el factor de daño contra el primer tipo
+            const damage1 = efficacies[0]?.find((e) => e.target_type_id === attackingTypeId)?.damage_factor ?? 100;
+
+            // Obtener el factor de daño contra el segundo tipo (si existe)
+            const damage2 = typeIds[1]
+                ? efficacies[1]?.find((e) => e.target_type_id === attackingTypeId)?.damage_factor ?? 100
+                : 100;
+
+            // Calcular la efectividad combinada multiplicando los factores
+            // Convertir de escala 0-200 a multiplicador decimal (0, 0.5, 1, 2)
+            const factor1 = damage1 / 100;
+            const factor2 = damage2 / 100;
+            const combinedFactor = factor1 * factor2;
+
+            // Convertir de vuelta a la escala original para clasificar
+            const multiplier = Math.round(combinedFactor * 100);
+
+            // Clasificar según la efectividad combinada
+            if (multiplier === 0) effectiveness.immune.push(attackingTypeId);
+            if (multiplier === 25) effectiveness['0.25x'].push(attackingTypeId);
+            if (multiplier === 50) effectiveness['0.5x'].push(attackingTypeId);
+            if (multiplier === 200) effectiveness['2x'].push(attackingTypeId);
+            if (multiplier === 400) effectiveness['4x'].push(attackingTypeId);
+            // Los tipos con efectividad 1x (100) no se incluyen en ningún array
+        }
+
         return new PokemonTypes({
-            ids: typeIds
+            ids: typeIds,
+            effectiveness
         });
     }
 }

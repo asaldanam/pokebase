@@ -37,6 +37,7 @@
 
 		createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
 			columnDefs: createPokemonTableCols({ lang, stats, types }),
+			rowHeight: 56,
 			defaultColDef: {
 				flex: 1
 			},

@@ -33,15 +33,15 @@ export function createPokemonTableCols(props: {
         // Types
         {
             field: 'types',
-            openByDefault: true,
+            openByDefault: false,
             floatingFilter: true,
             children: [
                 {
                     field: 'types',
                     filter: 'agTextColumnFilter',
                     floatingFilter: true,
-                    maxWidth: 280,
-                    minWidth: 280,
+                    minWidth: 160,
+                    maxWidth: 160,
                     valueFormatter: ({ value }) => {
                         const types = value as PokemonTypes;
                         return types.ids.map((id) => types[id]?.name || 'Unknown').join(', ');
@@ -51,50 +51,61 @@ export function createPokemonTableCols(props: {
                         return data.types.ids.map((id: number) => types[id].name);
                     },
                     cellRenderer: ({ value }) => {
-                        const types = value as PokemonTypes;
-                        return types.ids
+                        const typesIds = (value as PokemonTypes).ids;
+                        const icons = typesIds
                             .map(
-                                (id) =>
-                                    `<img src="/static/types/${lang}/${id}.png" alt="${id}" style="width: 90px; margin-right: 0.5rem" />`
+                                (id) => /*html*/ `
+                                    <img src="/static/types/${lang}/${id}.png" alt="${id}" style="height: 18px;"/>
+                                `
                             )
                             .join('');
+                        return /*html*/ `
+                                        <div
+                                            style="
+                                                display: flex;
+                                                flex-direction: column;
+                                                gap: 4px;
+                                                align-items: center;
+                                                justify-content: center;
+                                                align-content: center;
+                                                max-width: 7rem;
+                                                height: 100%;
+                                            "
+                                        >
+                                            ${icons}
+                                        </div>
+                                    `;
                     }
                 },
                 {
                     field: 'types.effectiveness',
-                    headerName: 'Effectiveness',
-                    filter: false,
-                    children: Object.values(EffectivenessCategory).map(
-                        (category) =>
-                            ({
-                                field: `types.effectiveness.${category}`,
-                                headerName: category,
-                                filter: 'agMultiColumnFilter',
-                                minWidth: 280,
-                                maxWidth: 280,
-                                //ordena por el número de tipos en esa categoría
-                                comparator(a, b) {
-                                    return (a?.length || 0) - (b?.length || 0);
-                                },
-                                cellRenderer: ({ value }) => {
-                                    const typesIds = value as Array<Type['id']>;
-                                    return typesIds
-                                        .map(
-                                            (id) =>
-                                                `<img src="/static/types/icons/${id}.svg" alt="${id}" style="width: 18px; margin-right: 2px" />`
-                                        )
-                                        .join('');
-                                }
-                            } as ColDef<PokemonTableRow>)
-                    )
+                    columnGroupShow: 'open',
+                    headerName: 'Weaknesses',
+                    openByDefault: true,
+                    children: [
+                        createEffectivenessColumn({ category: EffectivenessCategory.DOUBLE, types }),
+                        createEffectivenessColumn({ category: EffectivenessCategory.QUADRUPLE, types })
+                    ]
+                },
+                {
+                    field: 'types.effectiveness',
+                    columnGroupShow: 'open',
+                    headerName: 'Resistances',
+                    openByDefault: true,
+                    children: [
+                        createEffectivenessColumn({ category: EffectivenessCategory.HALF, types }),
+                        createEffectivenessColumn({ category: EffectivenessCategory.QUARTER, types }),
+                        createEffectivenessColumn({ category: EffectivenessCategory.IMMUNE, types })
+                    ]
                 }
             ]
         },
 
+        // Stats
         {
             field: 'stats',
             wrapHeaderText: true,
-            openByDefault: true,
+            openByDefault: false,
             children: [
                 {
                     field: 'stats.total',
@@ -127,7 +138,7 @@ export function createPokemonTableCols(props: {
             floatingFilter: true,
             valueFormatter: ({ context, value }) => {
                 const count = value.length;
-                return `${count} move${count !== 1 ? 's' : ''}`;
+                return `${count} move${count !== 1 ? 's' : ''} total`;
             },
             filterValueGetter: ({ data }) => {
                 return data?.moves.map((move) => move.name).join(', ');
@@ -137,3 +148,51 @@ export function createPokemonTableCols(props: {
         }
     ];
 }
+
+const createEffectivenessColumn = (props: {
+    category: EffectivenessCategory;
+    types: Awaited<FindTypesResponse>;
+}): ColDef<PokemonTableRow> => {
+    const { category, types } = props;
+    return {
+        field: `types.effectiveness.${category}`,
+        headerName: category.charAt(0).toUpperCase() + category.slice(1),
+        filter: 'agMultiColumnFilter',
+        columnGroupShow: 'open',
+        floatingFilter: true,
+        minWidth: 130,
+        maxWidth: 130,
+        //ordena por el número de tipos en esa categoría
+        comparator(a, b) {
+            return (a?.length || 0) - (b?.length || 0);
+        },
+        filterValueGetter: ({ data }) => {
+            if (!data) return '';
+            return (data.types.effectiveness[category] || []).map((id: number) => types[id].name).join(', ');
+        },
+        cellRenderer: ({ value }) => {
+            const typesIds = value as Array<Type['id']>;
+            const icons = typesIds
+                .map(
+                    (id) => /*html*/ `
+                        <img src="/static/types/icons/${id}.svg" alt="${id}" style="height: 18px;"/>
+                    `
+                )
+                .join('');
+            return /*html*/ `
+                <div
+                    style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 4px;
+                        max-width: 7rem;
+                        height: 100%;
+                        align-content: center;
+                    "
+                >
+                    ${icons}
+                </div>
+            `;
+        }
+    };
+};

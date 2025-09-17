@@ -19,3 +19,5 @@ export const findPokemon = async (params?: { lang?: string; gen?: number }) => {
 
     return pokemon;
 };
+
+export type FindPokemonResponse = ReturnType<typeof findPokemon>;

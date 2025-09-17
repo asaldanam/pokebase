@@ -15,3 +15,5 @@ export const countPokemon = async (params?: { where?: Pokemon_Bool_Exp }) => {
 
     return response.data.pokemon_aggregate.aggregate?.count || 0;
 };
+
+export type CountPokemonResponse = ReturnType<typeof countPokemon>;

@@ -1,4 +1,4 @@
-import PokeApi from '@services/PokeApi';
+import * as PokeApi from '@services/PokeApi';
 import type { APIRoute } from 'astro';
 
 export async function getStaticPaths() {

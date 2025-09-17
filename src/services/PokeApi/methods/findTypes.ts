@@ -20,3 +20,5 @@ export const findTypes = async (params: { lang?: string; gen?: number }) => {
 
     return types;
 };
+
+export type FindTypesResponse = ReturnType<typeof findTypes>;

@@ -6,7 +6,16 @@
 
 <script>
 	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';
-	import type { Pokemon, Move, Stat, Type } from '@services/PokeApi';
+	import type {
+		Pokemon,
+		Move,
+		Stat,
+		Type,
+		FindPokemonResponse,
+		FindMovesResponse,
+		FindStatsResponse,
+		FindTypesResponse
+	} from '@services/PokeApi';
 	import {
 		ClientSideRowModelModule,
 		createGrid,
@@ -40,10 +49,10 @@
 		const request = (path: string) => fetch(`/data/${lang}${path}`).then((res) => res.json());
 
 		const [pokemon, moves, stats, types] = await Promise.all([
-			request(`/pokemon.json`) as Promise<Pokemon[]>,
-			request(`/moves.json`) as Promise<Move[]>,
-			request(`/stats.json`) as Promise<Record<string, Stat>>,
-			request(`/types.json`) as Promise<Record<string, Type>>
+			request(`/pokemon.json`) as FindPokemonResponse,
+			request(`/moves.json`) as FindMovesResponse,
+			request(`/stats.json`) as FindStatsResponse,
+			request(`/types.json`) as FindTypesResponse
 		]);
 
 		const rows: Row[] = (pokemon as Pokemon[]).map((pokemon: Pokemon) => ({

@@ -1,5 +1,6 @@
 export * from './models/Move';
 export * from './models/Pokemon';
+export * from './models/PokemonTypes';
 export * from './models/Stat';
 export * from './models/Type';
 

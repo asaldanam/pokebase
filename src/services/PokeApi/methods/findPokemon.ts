@@ -30,9 +30,9 @@ export const findPokemon = async (params?: { lang?: string; gen?: number }) => {
     if (!query.pokemon.data) throw new Error(`No data returned for Pokémon`);
     if (!query.types.data) throw new Error(`No data returned for types`);
 
-    const result = query.pokemon.data.results.map((pokemon) =>
-        Pokemon.fromQuery({ pokemon, types: query.types.data!.results })
-    );
+    const result = query.pokemon.data.results
+        //
+        .map((pokemon) => Pokemon.fromQuery({ pokemon, types: query.types.data!.results }));
 
     return result;
 };

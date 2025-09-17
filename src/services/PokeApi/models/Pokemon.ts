@@ -6,7 +6,7 @@ export class Pokemon {
     id!: number;
     name!: string;
     types!: PokemonTypes;
-    stats!: Record<Stat['id'] & 'total', number>;
+    stats!: Record<string, number>;
     moves!: { id: number; learn: { method: string; level?: number } }[];
 
     constructor(params: Pokemon) {

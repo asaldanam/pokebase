@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 export const GET: APIRoute = async ({ params }) => {
     try {
         const { lang } = params;
-        const types = await PokeApi.GetTypes({ lang });
+        const types = await PokeApi.findTypes({ lang });
 
         return new Response(JSON.stringify(types), {
             status: 200,

@@ -1,11 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { PokeApiClient } from '../clients/PokeApiClient';
-import { Move } from '../models/Move';
-import type { GetMovesQuery, GetMovesQueryVariables } from '../types/PokeApiTypes';
-
-// Query con nombre para generar tipos específicos
-export const GET_MOVES = gql`
+export const GetMoves = gql`
     query GetMoves($lang: String = "en", $gen: Int) {
         results: move {
             id
@@ -46,21 +41,3 @@ export const GET_MOVES = gql`
         }
     }
 `;
-
-export const GetMoves = async (params: { lang?: string; gen?: number }) => {
-    const { lang = 'en', gen = 9 } = params;
-    const response = await PokeApiClient.query<GetMovesQuery, GetMovesQueryVariables>({
-        query: GET_MOVES,
-        variables: { lang, gen },
-        errorPolicy: 'all'
-    });
-
-    if (response.error) throw new Error(`Error fetching moves: ${response.error.message}`);
-    if (!response.data?.results) throw new Error(`No data returned for moves`);
-
-    const moves = response.data.results
-        .map((data) => Move.fromQuery(data))
-        .reduce((moves, move) => ({ ...moves, [move.id]: move }), {} as Record<number, Move>);
-
-    return moves;
-};

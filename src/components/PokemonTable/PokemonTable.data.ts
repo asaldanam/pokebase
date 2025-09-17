@@ -10,7 +10,7 @@ import type {
 export type PokemonTableRow = Omit<Pokemon, 'moves'> & { moves: Move[] } & {};
 
 export async function getPokemonTableData(props: { lang: string }) {
-    const request = (path: string) => fetch(`/data/${props.lang}${path}`).then((res) => res.json());
+    const request = (path: string) => fetch(`/pokebase/data/${props.lang}${path}`).then((res) => res.json());
 
     const [pokemon, moves, stats, types] = await Promise.all([
         request(`/pokemon.json`) as FindPokemonResponse,

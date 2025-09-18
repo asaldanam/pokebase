@@ -23,9 +23,34 @@ export function createPokemonTableCols(props: {
             field: 'name',
             filter: 'agTextColumnFilter',
             floatingFilter: false,
-            minWidth: 200,
-            maxWidth: 200,
-            valueFormatter: ({ value }) => value.charAt(0).toUpperCase() + value.slice(1)
+            minWidth: 240,
+            maxWidth: 240,
+            valueFormatter: ({ value }) => value.charAt(0).toUpperCase() + value.slice(1),
+            // cellRender con la imagen desde "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png"
+            cellRenderer: ({ data }) => {
+                const pokemon = data as Pokemon;
+                const { id, name } = pokemon;
+                return /*html*/ `
+                    <div
+                        style="
+                            display: flex;
+                            flex-direction: row;
+                            gap: 4px;
+                            align-items: center;
+                            justify-content: flex-start;
+                            align-content: center;
+                            height: 100%;
+                        "
+                    >
+                        <img
+                            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png"
+                            alt="${name}"
+                            style="height: 4rem;"
+                        />
+                        <span>${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</span>
+                    </div>
+                `;
+            }
         },
 
         // Types

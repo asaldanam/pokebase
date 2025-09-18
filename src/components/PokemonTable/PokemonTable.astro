@@ -4,18 +4,10 @@ import Logo from './assets/pokemon-logo.svg';
 ---
 
 <div class="h-full w-full flex flex-col">
-	<header class="bg-red-600 p-3 flex items-center justify-between">
+	<header class="bg-red-600 p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
 		<Image src={Logo} alt="Pokémon" height="42" />
-		<div id="PokemonTableFilters" class="flex">
-			<!-- Example filter pill -->
-			<!-- <div class="bg-white text-red-600 px-3 py-1 gap-3 rounded-full mr-2 flex items-center text-sm">
-				<div class="flex gap-1 items-center">
-					<span class="font-bold">Types</span>
-					<span class="uppercase text-xs">Contains</span>
-					<span class="font-bold">Fuego</span>
-				</div>
-				<button class="text-red-600 hover:text-red-800">&times;</button>
-			</div> -->
+		<div id="PokemonTableFilters" class="flex flex-wrap gap-2 max-w-full overflow-x-auto">
+			<!-- Los pills de filtros se añadirán aquí dinámicamente -->
 		</div>
 	</header>
 	<div id="PokemonTable" class="w-full flex-1"></div>
@@ -30,7 +22,9 @@ import Logo from './assets/pokemon-logo.svg';
 		ModuleRegistry,
 		NumberFilterModule,
 		TextFilterModule,
-		ValidationModule
+		ValidationModule,
+		type GridApi,
+		type FilterChangedEvent
 	} from 'ag-grid-community';
 	import { createPokemonTableCols } from './PokemonTable.cols';
 	import { getPokemonTableData } from './PokemonTable.data';
@@ -53,6 +47,184 @@ import Logo from './assets/pokemon-logo.svg';
 
 		const { rows, stats, types } = await getPokemonTableData({ lang });
 
+		// Estado para gestionar los filtros activos
+		let activeFilters: Map<string, any> = new Map();
+		let gridApi: GridApi;
+
+		// Función para obtener el nombre amigable de la columna
+		function getColumnDisplayName(colId: string): string {
+			const columnMap: Record<string, string> = {
+				name: 'Nombre',
+				types: 'Tipos',
+				moves: 'Movimientos',
+				'stats.total': 'Total Stats',
+				'stats.1': stats[1]?.name || 'HP',
+				'stats.2': stats[2]?.name || 'Attack',
+				'stats.3': stats[3]?.name || 'Defense',
+				'stats.4': stats[4]?.name || 'Sp. Attack',
+				'stats.5': stats[5]?.name || 'Sp. Defense',
+				'stats.6': stats[6]?.name || 'Speed',
+				id: 'ID'
+			};
+
+			// Manejar columnas de efectividad
+			if (colId.includes('types.effectiveness')) {
+				const parts = colId.split('.');
+				const category = parts[parts.length - 1];
+				const categoryMap: Record<string, string> = {
+					double: 'Debilidad 2x',
+					quadruple: 'Debilidad 4x',
+					half: 'Resistencia 1/2x',
+					quarter: 'Resistencia 1/4x',
+					immune: 'Inmunidad'
+				};
+				return categoryMap[category] || `${category.charAt(0).toUpperCase() + category.slice(1)} Effectiveness`;
+			}
+
+			return columnMap[colId] || colId;
+		}
+
+		// Función para obtener el tipo de filtro en español
+		function getFilterTypeDisplayName(filterType: string): string {
+			const filterTypeMap: Record<string, string> = {
+				equals: 'Es igual a',
+				notEqual: 'No es igual a',
+				contains: 'Contiene',
+				notContains: 'No contiene',
+				startsWith: 'Empieza con',
+				endsWith: 'Termina con',
+				greaterThan: 'Mayor que',
+				greaterThanOrEqual: 'Mayor o igual que',
+				lessThan: 'Menor que',
+				lessThanOrEqual: 'Menor o igual que',
+				inRange: 'En rango'
+			};
+			return filterTypeMap[filterType] || filterType;
+		}
+
+		// Función para formatear el valor del filtro
+		function formatFilterValue(value: any): string {
+			if (Array.isArray(value)) {
+				return value.join(', ');
+			}
+			if (typeof value === 'object' && value !== null) {
+				if (value.from !== undefined && value.to !== undefined) {
+					return `${value.from} - ${value.to}`;
+				}
+				return JSON.stringify(value);
+			}
+			return String(value);
+		}
+
+		// Función para renderizar los pills de filtros
+		function renderFilterPills() {
+			const filtersContainer = document.getElementById('PokemonTableFilters');
+			if (!filtersContainer) return;
+
+			filtersContainer.innerHTML = '';
+
+			activeFilters.forEach((filterModel, colId) => {
+				// Manejar diferentes tipos de filtros
+				if (filterModel.filterType || filterModel.type) {
+					const filterType = filterModel.filterType || filterModel.type;
+					const filterValue = filterModel.filter || filterModel.value;
+
+					if (filterValue !== undefined && filterValue !== null && filterValue !== '') {
+						createFilterPill(filtersContainer, colId, filterType, filterValue);
+					}
+				} else if (filterModel.condition1 || filterModel.condition2) {
+					// Filtros combinados
+					if (filterModel.condition1) {
+						createFilterPill(
+							filtersContainer,
+							colId,
+							filterModel.condition1.type,
+							filterModel.condition1.filter
+						);
+					}
+					if (filterModel.condition2) {
+						createFilterPill(
+							filtersContainer,
+							colId,
+							filterModel.condition2.type,
+							filterModel.condition2.filter
+						);
+					}
+				} else if (filterModel.values) {
+					// Set filter
+					const selectedValues = filterModel.values.filter((v: any) => v !== null && v !== undefined);
+					if (selectedValues.length > 0) {
+						createFilterPill(filtersContainer, colId, 'in', selectedValues);
+					}
+				}
+			});
+		}
+
+		// Función para crear un pill individual
+		function createFilterPill(container: HTMLElement, colId: string, filterType: string, filterValue: any) {
+			const pill = document.createElement('div');
+			pill.className = 'bg-white text-red-600 px-3 py-1 gap-2 rounded-full flex items-center text-sm shadow-sm';
+
+			const columnName = getColumnDisplayName(colId);
+			const filterTypeName = getFilterTypeDisplayName(filterType);
+			let formattedValue = formatFilterValue(filterValue);
+
+			// Truncar valores muy largos
+			if (formattedValue.length > 20) {
+				formattedValue = formattedValue.substring(0, 17) + '...';
+			}
+
+			pill.innerHTML = `
+				<div class="flex gap-1 items-center">
+					<span class="font-bold">${columnName}</span>
+					<span class="uppercase text-xs opacity-75">${filterTypeName}</span>
+					<span class="font-bold">${formattedValue}</span>
+				</div>
+				<button 
+					class="text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full w-5 h-5 flex items-center justify-center text-lg font-bold transition-colors" 
+					data-col-id="${colId}"
+					title="Eliminar filtro"
+				>&times;</button>
+			`;
+
+			// Añadir evento para eliminar el filtro
+			const removeButton = pill.querySelector('button');
+			if (removeButton) {
+				removeButton.addEventListener('click', () => {
+					removeFilter(colId);
+				});
+			}
+
+			container.appendChild(pill);
+		}
+
+		// Función para eliminar un filtro
+		function removeFilter(colId: string) {
+			if (gridApi) {
+				// Eliminar el filtro del grid
+				gridApi.setColumnFilterModel(colId, null);
+				// Forzar el refresco de los filtros
+				gridApi.onFilterChanged();
+			}
+		}
+
+		// Función para manejar cambios en los filtros
+		function onFilterChanged(event: FilterChangedEvent) {
+			activeFilters.clear();
+
+			if (gridApi) {
+				const filterModel = gridApi.getFilterModel();
+
+				Object.entries(filterModel).forEach(([colId, filter]) => {
+					if (filter) {
+						activeFilters.set(colId, filter);
+					}
+				});
+			}
+
+			renderFilterPills();
+		}
+
 		const grid = createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
 			columnDefs: createPokemonTableCols({ lang, stats, types }),
 			defaultColDef: { flex: 1 },
@@ -60,11 +232,15 @@ import Logo from './assets/pokemon-logo.svg';
 			headerHeight: 36,
 			rowData: rows,
 			theme: createPokemonTableTheme({ mode: 'light' }),
-			groupDefaultExpanded: -1
+			groupDefaultExpanded: -1,
+			onFilterChanged: onFilterChanged
 			// enableAdvancedFilter: true
 			// treeData: true,
 			// getDataPath: (data) => data.path
 		});
+
+		// Guardar referencia a la API del grid
+		gridApi = grid;
 
 		// Escuchar cambios en el tema del sistema
 		window
@@ -88,5 +264,28 @@ import Logo from './assets/pokemon-logo.svg';
 		/* --ag-border-color: #f2f5f8;
 		border-left: 1px solid var(--ag-border-color);
 		border-bottom: 1px solid var(--ag-border-color); */
+	}
+
+	/* Estilos para los pills de filtros */
+	#PokemonTableFilters {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+	}
+
+	#PokemonTableFilters::-webkit-scrollbar {
+		height: 4px;
+	}
+
+	#PokemonTableFilters::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	#PokemonTableFilters::-webkit-scrollbar-thumb {
+		background-color: rgba(255, 255, 255, 0.5);
+		border-radius: 2px;
+	}
+
+	#PokemonTableFilters::-webkit-scrollbar-thumb:hover {
+		background-color: rgba(255, 255, 255, 0.7);
 	}
 </style>

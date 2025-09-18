@@ -40,7 +40,7 @@
 
 		const { rows, stats, types } = await getPokemonTableData({ lang });
 
-		createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
+		const grid = createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
 			columnDefs: createPokemonTableCols({ lang, stats, types }),
 			defaultColDef: { flex: 1 },
 			rowHeight: 52,
@@ -52,6 +52,14 @@
 			// treeData: true,
 			// getDataPath: (data) => data.path
 		});
+
+		// Escuchar cambios en el tema del sistema
+		window
+			.matchMedia('(prefers-color-scheme: dark)')
+			.addEventListener('change', (e: MediaQueryListEvent | MediaQueryList) => {
+				const mode = e.matches ? 'dark' : 'light';
+				grid.setGridOption('theme', createPokemonTableTheme({ mode }));
+			});
 	}
 </script>
 

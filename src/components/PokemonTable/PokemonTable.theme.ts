@@ -15,6 +15,9 @@ export function createPokemonTableTheme(props: { mode: 'light' | 'dark' }): Grid
         .withParams({
             spacing: 10,
             accentColor: 'red',
+            headerBackgroundColor: 'red',
+            headerTextColor: 'white',
+            iconButtonHoverColor: 'inherit',
             borderRadius: 0,
             wrapperBorderRadius: 0,
             wrapperBorder: 'none',

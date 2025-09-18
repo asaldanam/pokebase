@@ -1,18 +1,12 @@
 ---
-import { Image } from 'astro:assets';
-import Logo from './assets/pokemon-logo.svg';
+
 ---
 
 <div class="h-full w-full flex flex-col">
-	<header class="bg-red-600 p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-		<Image src={Logo} alt="Pokémon" height="42" />
-		<div class="max-w-full">
-			<div id="PokemonTableFilters" class="flex flex-wrap gap-1 overflow-x-auto">
-				<!-- Los pills de filtros se añadirán aquí dinámicamente -->
-			</div>
-		</div>
-	</header>
 	<div id="PokemonTable" class="w-full flex-1"></div>
+	<div class="max-w-full bg-slate-800 px-2">
+		<div id="PokemonTableFilters" class="flex flex-wrap gap-1 overflow-x-auto"></div>
+	</div>
 </div>
 
 <script>
@@ -91,10 +85,11 @@ import Logo from './assets/pokemon-logo.svg';
 		opacity: 0 !important;
 	}
 
-	.ag-cell {
-		/* --ag-border-color: #f2f5f8;
-		border-left: 1px solid var(--ag-border-color);
-		border-bottom: 1px solid var(--ag-border-color); */
+	.ag-header-icon.ag-header-cell-filter-button {
+		padding: 0.35rem 0.75rem;
+		margin-right: -0.75rem;
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 0.375rem;
 	}
 
 	/* Estilos para los pills de filtros */

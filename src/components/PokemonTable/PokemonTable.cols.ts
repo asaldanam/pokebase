@@ -22,7 +22,7 @@ export function createPokemonTableCols(props: {
                 const id = `#${value.toString().padStart(4, '0')}`;
                 const href = `https://pokemondb.net/pokedex/${value}`;
                 return /*html*/ `
-                    <a href="${href}" target="_blank" rel="noopener noreferrer">${id}</a>
+                    <a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${id}</a>
                 `;
             }
         },

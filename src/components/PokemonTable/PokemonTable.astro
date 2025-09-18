@@ -1,8 +1,25 @@
 ---
-// Componente para la tabla de Pokemon usando AG Grid
+import { Image } from 'astro:assets';
+import Logo from './assets/pokemon-logo.svg';
 ---
 
-<div id="PokemonTable" class="h-full w-full"></div>
+<div class="h-full w-full flex flex-col">
+	<header class="bg-red-600 p-3 flex items-center justify-between">
+		<Image src={Logo} alt="Pokémon" height="42" />
+		<div id="PokemonTableFilters" class="flex">
+			<!-- Example filter pill -->
+			<!-- <div class="bg-white text-red-600 px-3 py-1 gap-3 rounded-full mr-2 flex items-center text-sm">
+				<div class="flex gap-1 items-center">
+					<span class="font-bold">Types</span>
+					<span class="uppercase text-xs">Contains</span>
+					<span class="font-bold">Fuego</span>
+				</div>
+				<button class="text-red-600 hover:text-red-800">&times;</button>
+			</div> -->
+		</div>
+	</header>
+	<div id="PokemonTable" class="w-full flex-1"></div>
+</div>
 
 <script>
 	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';

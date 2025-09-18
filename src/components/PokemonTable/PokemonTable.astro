@@ -2,29 +2,25 @@
 // Componente para la tabla de Pokemon usando AG Grid
 ---
 
-<style is:global>
-	.ag-watermark *,
-	.ag-watermark::before {
-		display: none !important;
-		visibility: hidden !important;
-		opacity: 0 !important;
-	}
-</style>
-
 <div id="PokemonTable" style="height: 100%; width: 100%;"></div>
 
 <script>
 	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';
 	import {
 		ClientSideRowModelModule,
+		colorSchemeDark,
+		colorSchemeVariable,
 		createGrid,
 		DateFilterModule,
 		ModuleRegistry,
 		NumberFilterModule,
 		TextFilterModule,
+		themeAlpine,
+		themeQuartz,
 		ValidationModule
 	} from 'ag-grid-community';
 	import { createPokemonTableCols } from './PokemonTable.cols';
+	import { createPokemonTableTheme } from './PokemonTable.theme';
 	import { getPokemonTableData } from './PokemonTable.data';
 
 	if (typeof window !== 'undefined') {
@@ -46,11 +42,11 @@
 
 		createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
 			columnDefs: createPokemonTableCols({ lang, stats, types }),
-			rowHeight: 56,
-			defaultColDef: {
-				flex: 1
-			},
+			defaultColDef: { flex: 1 },
+			rowHeight: 52,
+			headerHeight: 36,
 			rowData: rows,
+			theme: createPokemonTableTheme({ mode: 'light' }),
 			groupDefaultExpanded: -1
 			// enableAdvancedFilter: true
 			// treeData: true,
@@ -58,3 +54,18 @@
 		});
 	}
 </script>
+
+<style is:global>
+	.ag-watermark *,
+	.ag-watermark::before {
+		display: none !important;
+		visibility: hidden !important;
+		opacity: 0 !important;
+	}
+
+	.ag-cell {
+		/* --ag-border-color: #f2f5f8;
+		border-left: 1px solid var(--ag-border-color);
+		border-bottom: 1px solid var(--ag-border-color); */
+	}
+</style>

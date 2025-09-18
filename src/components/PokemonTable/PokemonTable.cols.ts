@@ -14,105 +14,113 @@ export function createPokemonTableCols(props: {
         // Pokemon
         {
             field: 'id',
-            pinned: true,
             maxWidth: 100,
             minWidth: 100,
             filter: false,
             valueFormatter: ({ value }) => `#${value.toString().padStart(4, '0')}`
         },
         {
-            pinned: true,
             field: 'name',
             filter: 'agTextColumnFilter',
-            floatingFilter: true,
+            floatingFilter: false,
+            minWidth: 200,
             maxWidth: 200,
-            minWidth: 80,
             valueFormatter: ({ value }) => value.charAt(0).toUpperCase() + value.slice(1)
         },
 
         // Types
         {
             field: 'types',
-            openByDefault: false,
-            floatingFilter: true,
+            filter: 'agTextColumnFilter',
+            floatingFilter: false,
+            minWidth: 160,
+            maxWidth: 160,
+            valueFormatter: ({ value }) => {
+                const types = value as PokemonTypes;
+                return types.ids.map((id) => types[id]?.name || 'Unknown').join(', ');
+            },
+            filterValueGetter: ({ data }) => {
+                if (!data) return '';
+                return data.types.ids.map((id: number) => types[id].name);
+            },
+            cellRenderer: ({ value }) => {
+                const typesIds = (value as PokemonTypes).ids;
+                const icons = typesIds
+                    .map(
+                        (id) => /*html*/ `
+                            <img src="/pokebase/static/types/${lang}/${id}.png" alt="${id}" style="height: 18px;"/>
+                        `
+                    )
+                    .join('');
+                return /*html*/ `
+                                <div
+                                    style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 4px;
+                                        align-items: center;
+                                        justify-content: center;
+                                        align-content: center;
+                                        max-width: 7rem;
+                                        height: 100%;
+                                    "
+                                >
+                                    ${icons}
+                                </div>
+                            `;
+            }
+        },
+        {
+            field: 'types.effectiveness',
+            columnGroupShow: 'open',
+            headerName: 'Weaknesses',
+            openByDefault: true,
             children: [
-                {
-                    field: 'types',
-                    filter: 'agTextColumnFilter',
-                    floatingFilter: true,
-                    minWidth: 160,
-                    maxWidth: 160,
-                    valueFormatter: ({ value }) => {
-                        const types = value as PokemonTypes;
-                        return types.ids.map((id) => types[id]?.name || 'Unknown').join(', ');
-                    },
-                    filterValueGetter: ({ data }) => {
-                        if (!data) return '';
-                        return data.types.ids.map((id: number) => types[id].name);
-                    },
-                    cellRenderer: ({ value }) => {
-                        const typesIds = (value as PokemonTypes).ids;
-                        const icons = typesIds
-                            .map(
-                                (id) => /*html*/ `
-                                    <img src="/pokebase/static/types/${lang}/${id}.png" alt="${id}" style="height: 18px;"/>
-                                `
-                            )
-                            .join('');
-                        return /*html*/ `
-                                        <div
-                                            style="
-                                                display: flex;
-                                                flex-direction: column;
-                                                gap: 4px;
-                                                align-items: center;
-                                                justify-content: center;
-                                                align-content: center;
-                                                max-width: 7rem;
-                                                height: 100%;
-                                            "
-                                        >
-                                            ${icons}
-                                        </div>
-                                    `;
-                    }
-                },
-                {
-                    field: 'types.effectiveness',
-                    columnGroupShow: 'open',
-                    headerName: 'Weaknesses',
-                    openByDefault: true,
-                    children: [
-                        createEffectivenessColumn({ category: EffectivenessCategory.DOUBLE, types }),
-                        createEffectivenessColumn({ category: EffectivenessCategory.QUADRUPLE, types })
-                    ]
-                },
-                {
-                    field: 'types.effectiveness',
-                    columnGroupShow: 'open',
-                    headerName: 'Resistances',
-                    openByDefault: true,
-                    children: [
-                        createEffectivenessColumn({ category: EffectivenessCategory.HALF, types }),
-                        createEffectivenessColumn({ category: EffectivenessCategory.QUARTER, types }),
-                        createEffectivenessColumn({ category: EffectivenessCategory.IMMUNE, types })
-                    ]
-                }
+                createEffectivenessColumn({ category: EffectivenessCategory.DOUBLE, types }),
+                createEffectivenessColumn({ category: EffectivenessCategory.QUADRUPLE, types })
             ]
+        },
+        {
+            field: 'types.effectiveness',
+            columnGroupShow: 'open',
+            headerName: 'Resistances',
+            openByDefault: true,
+            children: [
+                createEffectivenessColumn({ category: EffectivenessCategory.HALF, types }),
+                createEffectivenessColumn({ category: EffectivenessCategory.QUARTER, types }),
+                createEffectivenessColumn({ category: EffectivenessCategory.IMMUNE, types })
+            ]
+        },
+
+        // Moves
+        {
+            field: 'moves',
+            filter: 'agTextColumnFilter',
+            headerName: 'Search moves',
+            floatingFilter: false,
+            valueFormatter: ({ context, value }) => {
+                const count = value.length;
+                return `${count} move${count !== 1 ? 's' : ''} total`;
+            },
+            filterValueGetter: ({ data }) => {
+                return data?.moves.map((move) => move.name).join(', ');
+            },
+            minWidth: 170,
+            maxWidth: 170
         },
 
         // Stats
         {
             field: 'stats',
             wrapHeaderText: true,
-            openByDefault: false,
+            openByDefault: true,
             children: [
                 {
                     field: 'stats.total',
                     headerName: 'Total',
                     // columnGroupShow: 'closed',
                     filter: 'agNumberColumnFilter',
-                    floatingFilter: true,
+                    floatingFilter: false,
                     minWidth: 180,
                     maxWidth: 180
                 },
@@ -123,43 +131,28 @@ export function createPokemonTableCols(props: {
                             headerName: `${stats[i]?.name || `Stat ${i}`}`,
                             columnGroupShow: 'open',
                             filter: 'agNumberColumnFilter',
-                            floatingFilter: true,
+                            floatingFilter: false,
                             minWidth: 120,
                             maxWidth: 120
                         } as ColDef<PokemonTableRow>)
                 )
             ]
-        },
-
-        // Moves
-        {
-            field: 'moves',
-            filter: 'agTextColumnFilter',
-            floatingFilter: true,
-            valueFormatter: ({ context, value }) => {
-                const count = value.length;
-                return `${count} move${count !== 1 ? 's' : ''} total`;
-            },
-            filterValueGetter: ({ data }) => {
-                return data?.moves.map((move) => move.name).join(', ');
-            },
-            minWidth: 280,
-            maxWidth: 280
         }
     ];
 }
 
 const createEffectivenessColumn = (props: {
+    name?: string;
     category: EffectivenessCategory;
     types: Awaited<FindTypesResponse>;
 }): ColDef<PokemonTableRow> => {
-    const { category, types } = props;
+    const { name = '', category, types } = props;
     return {
         field: `types.effectiveness.${category}`,
-        headerName: category.charAt(0).toUpperCase() + category.slice(1),
+        headerName: `${name} ${category.charAt(0).toUpperCase() + category.slice(1)}`,
         filter: 'agMultiColumnFilter',
         columnGroupShow: 'open',
-        floatingFilter: true,
+        floatingFilter: false,
         minWidth: 150,
         maxWidth: 150,
         //ordena por el número de tipos en esa categoría

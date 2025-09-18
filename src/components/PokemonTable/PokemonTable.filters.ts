@@ -128,8 +128,25 @@ export function createFilterPillsManager(props: {
         Object.entries(filterModel).forEach(([colId, filter]: [string, any]) => {
             if (!filter) return;
 
+            // Manejar filtros con conditions array (AND/OR)
+            if (filter.conditions && Array.isArray(filter.conditions)) {
+                filter.conditions.forEach((condition: any) => {
+                    if (
+                        condition &&
+                        condition.filter !== undefined &&
+                        condition.filter !== null &&
+                        condition.filter !== ''
+                    ) {
+                        filters.push({
+                            colId,
+                            filterType: condition.type,
+                            filterValue: condition.filter
+                        });
+                    }
+                });
+            }
             // Manejar agMultiColumnFilter (filtros múltiples)
-            if (filter.filterType === 'multi') {
+            else if (filter.filterType === 'multi') {
                 Object.entries(filter).forEach(([key, condition]: [string, any]) => {
                     if (
                         key.startsWith('condition') &&

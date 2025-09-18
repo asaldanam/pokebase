@@ -17,7 +17,14 @@ export function createPokemonTableCols(props: {
             maxWidth: 100,
             minWidth: 100,
             filter: false,
-            valueFormatter: ({ value }) => `#${value.toString().padStart(4, '0')}`
+            valueFormatter: ({ value }) => `#${value.toString().padStart(4, '0')}`,
+            cellRenderer: ({ value }) => {
+                const id = `#${value.toString().padStart(4, '0')}`;
+                const href = `https://pokemondb.net/pokedex/${value}`;
+                return /*html*/ `
+                    <a href="${href}" target="_blank" rel="noopener noreferrer">${id}</a>
+                `;
+            }
         },
         {
             field: 'name',
@@ -26,7 +33,6 @@ export function createPokemonTableCols(props: {
             minWidth: 240,
             maxWidth: 240,
             valueFormatter: ({ value }) => value.charAt(0).toUpperCase() + value.slice(1),
-            // cellRender con la imagen desde "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png"
             cellRenderer: ({ data }) => {
                 const pokemon = data as Pokemon;
                 const { id, name } = pokemon;
@@ -45,7 +51,8 @@ export function createPokemonTableCols(props: {
                         <img
                             src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png"
                             alt="${name}"
-                            style="height: 4rem;"
+                            style="height: 4rem; margin-left: -.85rem;"
+                            onerror="this.style.display='none';"
                         />
                         <span>${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</span>
                     </div>
@@ -58,8 +65,8 @@ export function createPokemonTableCols(props: {
             field: 'types',
             filter: 'agTextColumnFilter',
             floatingFilter: false,
-            minWidth: 160,
-            maxWidth: 160,
+            minWidth: 130,
+            maxWidth: 130,
             valueFormatter: ({ value }) => {
                 const types = value as PokemonTypes;
                 return types.ids.map((id) => types[id]?.name || 'Unknown').join(', ');

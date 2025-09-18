@@ -87,17 +87,19 @@ import Logo from './assets/pokemon-logo.svg';
 		// Función para obtener el tipo de filtro en español
 		function getFilterTypeDisplayName(filterType: string): string {
 			const filterTypeMap: Record<string, string> = {
-				equals: 'Es igual a',
-				notEqual: 'No es igual a',
-				contains: 'Contiene',
-				notContains: 'No contiene',
-				startsWith: 'Empieza con',
-				endsWith: 'Termina con',
-				greaterThan: 'Mayor que',
-				greaterThanOrEqual: 'Mayor o igual que',
-				lessThan: 'Menor que',
-				lessThanOrEqual: 'Menor o igual que',
-				inRange: 'En rango'
+				equals: 'Equals',
+				notEqual: 'Does not equal',
+				contains: 'Contains',
+				notContains: 'Does not contain',
+				startsWith: 'Begins with',
+				endsWith: 'Ends with',
+				greaterThan: 'Greater than',
+				greaterThanOrEqual: 'Greater than or equal',
+				lessThan: 'Less than',
+				lessThanOrEqual: 'Less than or equal',
+				inRange: 'In range',
+				blank: 'Is blank',
+				notBlank: 'Is not blank'
 			};
 			return filterTypeMap[filterType] || filterType;
 		}
@@ -141,7 +143,8 @@ import Logo from './assets/pokemon-logo.svg';
 				}
 				// Manejar filtros simples
 				else if (filterModel.filterType || filterModel.type) {
-					const filterType = filterModel.filterType || filterModel.type;
+					// Usar el operador real (type) en lugar del filterType
+					const filterType = filterModel.type || filterModel.filterType;
 					const filterValue = filterModel.filter || filterModel.value;
 
 					if (filterValue !== undefined && filterValue !== null && filterValue !== '') {

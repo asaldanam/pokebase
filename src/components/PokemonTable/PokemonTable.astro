@@ -8,20 +8,16 @@
 	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';
 	import {
 		ClientSideRowModelModule,
-		colorSchemeDark,
-		colorSchemeVariable,
 		createGrid,
 		DateFilterModule,
 		ModuleRegistry,
 		NumberFilterModule,
 		TextFilterModule,
-		themeAlpine,
-		themeQuartz,
 		ValidationModule
 	} from 'ag-grid-community';
 	import { createPokemonTableCols } from './PokemonTable.cols';
-	import { createPokemonTableTheme } from './PokemonTable.theme';
 	import { getPokemonTableData } from './PokemonTable.data';
+	import { createPokemonTableTheme } from './PokemonTable.theme';
 
 	if (typeof window !== 'undefined') {
 		ModuleRegistry.registerModules([
@@ -44,7 +40,7 @@
 			columnDefs: createPokemonTableCols({ lang, stats, types }),
 			defaultColDef: { flex: 1 },
 			rowHeight: 52,
-			headerHeight: 40,
+			headerHeight: 36,
 			rowData: rows,
 			theme: createPokemonTableTheme({ mode: 'light' }),
 			groupDefaultExpanded: -1

@@ -124,17 +124,38 @@ import Logo from './assets/pokemon-logo.svg';
 			filtersContainer.innerHTML = '';
 
 			activeFilters.forEach((filterModel, colId) => {
-				// Manejar diferentes tipos de filtros
-				if (filterModel.filterType || filterModel.type) {
+				// Manejar agMultiColumnFilter (filtros múltiples)
+				if (filterModel.filterType === 'multi') {
+					// Procesar cada condición del filtro múltiple
+					Object.entries(filterModel).forEach(([key, condition]: [string, any]) => {
+						if (
+							key.startsWith('condition') &&
+							condition &&
+							condition.filter !== undefined &&
+							condition.filter !== null &&
+							condition.filter !== ''
+						) {
+							createFilterPill(filtersContainer, colId, condition.type, condition.filter);
+						}
+					});
+				}
+				// Manejar filtros simples
+				else if (filterModel.filterType || filterModel.type) {
 					const filterType = filterModel.filterType || filterModel.type;
 					const filterValue = filterModel.filter || filterModel.value;
 
 					if (filterValue !== undefined && filterValue !== null && filterValue !== '') {
 						createFilterPill(filtersContainer, colId, filterType, filterValue);
 					}
-				} else if (filterModel.condition1 || filterModel.condition2) {
-					// Filtros combinados
-					if (filterModel.condition1) {
+				}
+				// Manejar filtros con condition1 y condition2 (estructura alternativa)
+				else if (filterModel.condition1 || filterModel.condition2) {
+					if (
+						filterModel.condition1 &&
+						filterModel.condition1.filter !== undefined &&
+						filterModel.condition1.filter !== null &&
+						filterModel.condition1.filter !== ''
+					) {
 						createFilterPill(
 							filtersContainer,
 							colId,
@@ -142,7 +163,12 @@ import Logo from './assets/pokemon-logo.svg';
 							filterModel.condition1.filter
 						);
 					}
-					if (filterModel.condition2) {
+					if (
+						filterModel.condition2 &&
+						filterModel.condition2.filter !== undefined &&
+						filterModel.condition2.filter !== null &&
+						filterModel.condition2.filter !== ''
+					) {
 						createFilterPill(
 							filtersContainer,
 							colId,
@@ -150,8 +176,9 @@ import Logo from './assets/pokemon-logo.svg';
 							filterModel.condition2.filter
 						);
 					}
-				} else if (filterModel.values) {
-					// Set filter
+				}
+				// Manejar set filters
+				else if (filterModel.values) {
 					const selectedValues = filterModel.values.filter((v: any) => v !== null && v !== undefined);
 					if (selectedValues.length > 0) {
 						createFilterPill(filtersContainer, colId, 'in', selectedValues);

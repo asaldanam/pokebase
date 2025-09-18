@@ -182,7 +182,7 @@ const createEffectivenessColumn = (props: {
     return {
         field: `types.effectiveness.${category}`,
         headerName: `${name} ${category.charAt(0).toUpperCase() + category.slice(1)}`,
-        filter: 'agMultiColumnFilter',
+        filter: 'agTextColumnFilter',
         columnGroupShow: 'open',
         floatingFilter: false,
         minWidth: 150,

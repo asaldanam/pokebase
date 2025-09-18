@@ -86,22 +86,39 @@ export function createFilterPillsManager(props: {
     // Crear un pill individual
     function createFilterPill(colId: string, filterType: string, filterValue: any): HTMLElement {
         const pill = document.createElement('div');
-        pill.className = 'bg-white text-red-600 px-3 py-1 gap-2 rounded-full flex items-center text-sm shadow-sm';
+        pill.className = 'bg-white text-red-600 px-2 py-1 gap-2 rounded-full flex items-center text-sm shadow-sm';
 
         const columnName = getColumnDisplayName(colId);
-        const filterTypeName = getFilterTypeDisplayName(filterType);
-        let formattedValue = formatFilterValue(filterValue);
+        let contentHtml: string;
 
-        // Truncar valores muy largos
-        if (formattedValue.length > 20) {
-            formattedValue = formattedValue.substring(0, 17) + '...';
+        // Manejar filtros combinados (múltiples condiciones)
+        if (filterType === 'combined') {
+            const { conditions, operator } = filterValue;
+            const conditionsHtml = conditions
+                .map((condition: any) => {
+                    const filterTypeName = getFilterTypeDisplayName(condition.type);
+                    const value = formatFilterValue(condition.filter);
+                    return `<span class="uppercase">${filterTypeName}</span> <span class="font-bold capitalize">${value}</span>`;
+                })
+                .join(` <span class="uppercase">${operator}</span> `);
+
+            contentHtml = conditionsHtml;
+        } else {
+            const filterTypeName = getFilterTypeDisplayName(filterType);
+            let formattedValue = formatFilterValue(filterValue);
+
+            // Truncar valores muy largos para filtros individuales
+            if (formattedValue.length > 20) {
+                formattedValue = formattedValue.substring(0, 17) + '...';
+            }
+
+            contentHtml = `<span class="uppercase text-xs opacity-75">${filterTypeName}</span> <span class="font-bold capitalize">${formattedValue}</span>`;
         }
 
         pill.innerHTML = `
 			<div class="flex gap-1 items-center">
 				<span class="font-bold">${columnName}</span>
-				<span class="uppercase text-xs opacity-75">${filterTypeName}</span>
-				<span class="font-bold">${formattedValue}</span>
+				<span class="text-xs">${contentHtml}</span>
 			</div>
 			<button 
 				class="text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full w-5 h-5 flex items-center justify-center text-lg font-bold transition-colors" 
@@ -119,9 +136,7 @@ export function createFilterPillsManager(props: {
         }
 
         return pill;
-    }
-
-    // Extraer filtros del modelo
+    } // Extraer filtros del modelo
     function extractFiltersFromModel(filterModel: any): Array<{ colId: string; filterType: string; filterValue: any }> {
         const filters: Array<{ colId: string; filterType: string; filterValue: any }> = [];
 
@@ -130,20 +145,23 @@ export function createFilterPillsManager(props: {
 
             // Manejar filtros con conditions array (AND/OR)
             if (filter.conditions && Array.isArray(filter.conditions)) {
-                filter.conditions.forEach((condition: any) => {
-                    if (
+                // Pasar las condiciones completas para procesamiento en el pill
+                const operator = filter.operator || 'AND';
+                const validConditions = filter.conditions.filter(
+                    (condition: any) =>
                         condition &&
                         condition.filter !== undefined &&
                         condition.filter !== null &&
                         condition.filter !== ''
-                    ) {
-                        filters.push({
-                            colId,
-                            filterType: condition.type,
-                            filterValue: condition.filter
-                        });
-                    }
-                });
+                );
+
+                if (validConditions.length > 0) {
+                    filters.push({
+                        colId,
+                        filterType: 'combined',
+                        filterValue: { conditions: validConditions, operator }
+                    });
+                }
             }
             // Manejar agMultiColumnFilter (filtros múltiples)
             else if (filter.filterType === 'multi') {

@@ -6,8 +6,10 @@ import Logo from './assets/pokemon-logo.svg';
 <div class="h-full w-full flex flex-col">
 	<header class="bg-red-600 p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
 		<Image src={Logo} alt="Pokémon" height="42" />
-		<div id="PokemonTableFilters" class="flex flex-wrap gap-2 max-w-full overflow-x-auto">
-			<!-- Los pills de filtros se añadirán aquí dinámicamente -->
+		<div class="max-w-full">
+			<div id="PokemonTableFilters" class="flex flex-wrap gap-1 overflow-x-auto">
+				<!-- Los pills de filtros se añadirán aquí dinámicamente -->
+			</div>
 		</div>
 	</header>
 	<div id="PokemonTable" class="w-full flex-1"></div>

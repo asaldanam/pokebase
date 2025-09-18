@@ -13,7 +13,7 @@ export function createPokemonTableCols(props: {
     return [
         // Pokemon
         {
-            field: 'name',
+            field: 'id',
             filter: false,
             pinned: true,
             sortable: false,
@@ -22,7 +22,6 @@ export function createPokemonTableCols(props: {
             headerComponent: LogoHeaderComponent,
             minWidth: 72,
             maxWidth: 72,
-            valueFormatter: ({ value }) => value.charAt(0).toUpperCase() + value.slice(1),
             cellRenderer: ({ data }) => {
                 const pokemon = data as Pokemon;
                 const { id, name } = pokemon;
@@ -59,12 +58,13 @@ export function createPokemonTableCols(props: {
                 const id = `#${value.toString().padStart(4, '0')}`;
                 const href = `https://pokemondb.net/pokedex/${value}`;
                 return /*html*/ `
-                    <a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${id}</a>
+                    <a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-400 underline">${id}</a>
                 `;
             }
         },
         {
             field: 'name',
+            headerName: 'Name',
             filter: 'agTextColumnFilter',
             floatingFilter: false,
             minWidth: 220,

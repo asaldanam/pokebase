@@ -4,7 +4,7 @@
 
 <div class="h-full w-full flex flex-col">
 	<div id="PokemonTable" class="w-full flex-1"></div>
-	<div class="max-w-full bg-slate-800 px-2">
+	<div class="max-w-full px-3 border-t-2 border-slate-500" style="background: hsl(217, 0%, 17%);">
 		<div id="PokemonTableFilters" class="flex flex-wrap gap-1 overflow-x-auto"></div>
 	</div>
 </div>
@@ -45,12 +45,13 @@
 
 		// Crear el manager de filtros
 		const filterManager = createFilterPillsManager({ stats, types });
-		let gridApi: GridApi;
 
 		// Función para manejar cambios en los filtros
 		function onFilterChanged(event: FilterChangedEvent) {
 			filterManager.onFilterChanged(event);
 		}
+
+		const colorscheme = window.matchMedia('(prefers-color-scheme: dark)');
 
 		const grid = createGrid(document.querySelector('#PokemonTable') as HTMLElement, {
 			columnDefs: createPokemonTableCols({ lang, stats, types }),
@@ -58,22 +59,21 @@
 			rowHeight: 52,
 			headerHeight: 36,
 			rowData: rows,
-			theme: createPokemonTableTheme({ mode: 'light' }),
+			theme: createPokemonTableTheme({
+				mode: colorscheme.matches ? 'dark' : 'light'
+			}),
 			groupDefaultExpanded: -1,
 			onFilterChanged: onFilterChanged
 		});
 
 		// Inicializar el manager de filtros
-		gridApi = grid;
-		filterManager.init('PokemonTableFilters', gridApi);
+		filterManager.init('PokemonTableFilters', grid);
 
 		// Escuchar cambios en el tema del sistema
-		window
-			.matchMedia('(prefers-color-scheme: dark)')
-			.addEventListener('change', (e: MediaQueryListEvent | MediaQueryList) => {
-				const mode = e.matches ? 'dark' : 'light';
-				grid.setGridOption('theme', createPokemonTableTheme({ mode }));
-			});
+		colorscheme.addEventListener('change', (e: MediaQueryListEvent | MediaQueryList) => {
+			const mode = e.matches ? 'dark' : 'light';
+			grid.setGridOption('theme', createPokemonTableTheme({ mode }));
+		});
 	}
 </script>
 
@@ -88,7 +88,7 @@
 	.ag-header-icon.ag-header-cell-filter-button {
 		padding: 0.35rem 0.75rem;
 		margin-right: -0.75rem;
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(1, 1, 1, 0.05);
 		border-radius: 0.375rem;
 	}
 

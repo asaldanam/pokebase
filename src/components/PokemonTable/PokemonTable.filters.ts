@@ -20,9 +20,9 @@ export function createFilterPillsManager(props: {
     // Mapeo de nombres de columnas
     function getColumnDisplayName(colId: string): string {
         const columnMap: Record<string, string> = {
-            name: 'Nombre',
-            types: 'Tipos',
-            moves: 'Movimientos',
+            name: 'Name',
+            types: 'Types',
+            moves: 'Moves',
             'stats.total': 'Total Stats',
             'stats.1': stats[1]?.name || 'HP',
             'stats.2': stats[2]?.name || 'Attack',
@@ -37,11 +37,11 @@ export function createFilterPillsManager(props: {
             const parts = colId.split('.');
             const category = parts[parts.length - 1];
             const categoryMap: Record<string, string> = {
-                double: 'Debilidad 2x',
-                quadruple: 'Debilidad 4x',
-                half: 'Resistencia 1/2x',
-                quarter: 'Resistencia 1/4x',
-                immune: 'Inmunidad'
+                double: 'Weak 2x',
+                quadruple: 'Weak 4x',
+                half: 'Resi 1/2x',
+                quarter: 'Resi 1/4x',
+                immune: 'Inmunity'
             };
             return categoryMap[category] || `${category.charAt(0).toUpperCase() + category.slice(1)} Effectiveness`;
         }
@@ -86,7 +86,7 @@ export function createFilterPillsManager(props: {
     // Crear un pill individual
     function createFilterPill(colId: string, filterType: string, filterValue: any): HTMLElement {
         const pill = document.createElement('div');
-        pill.className = 'bg-white text-red-600 px-2 py-1 gap-2 flex items-center text-sm shadow-sm my-2 rounded-md';
+        pill.className = 'bg-white text-red-600 px-2 py-1 gap-2 flex items-center text-sm shadow-sm my-3 rounded-md';
 
         const columnName = getColumnDisplayName(colId);
         let contentHtml: string;

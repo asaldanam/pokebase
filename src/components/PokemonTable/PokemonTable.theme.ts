@@ -2,8 +2,7 @@ import {
     colorSchemeDark,
     colorSchemeLight,
     colorSchemeVariable,
-    iconSetQuartzLight,
-    themeAlpine,
+    iconSetQuartz,
     themeBalham,
     type GridOptions
 } from 'ag-grid-community';
@@ -16,14 +15,11 @@ export function createPokemonTableTheme(props: { mode: 'light' | 'dark' }): Grid
         .withParams({
             spacing: 10,
             accentColor: 'red',
-            headerBackgroundColor: 'red',
-            headerTextColor: 'white',
-            iconButtonHoverColor: 'inherit',
             borderRadius: 0,
             wrapperBorderRadius: 0,
             wrapperBorder: 'none',
             columnBorder: '1px solid var(--ag-border-color)'
         })
         .withPart((mode === 'light' && colorSchemeLight) || (mode === 'dark' && colorSchemeDark) || colorSchemeVariable)
-        .withPart(iconSetQuartzLight);
+        .withPart(iconSetQuartz);
 }

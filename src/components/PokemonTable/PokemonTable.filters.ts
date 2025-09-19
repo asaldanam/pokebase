@@ -86,7 +86,8 @@ export function createFilterPillsManager(props: {
     // Crear un pill individual
     function createFilterPill(colId: string, filterType: string, filterValue: any): HTMLElement {
         const pill = document.createElement('div');
-        pill.className = 'bg-white text-red-600 px-2 py-1 gap-2 flex items-center text-sm shadow-sm my-3 rounded-md';
+        pill.className =
+            'bg-white text-red-600 px-2 py-1 gap-2 flex items-center text-sm shadow-md rounded-md border border-red-600';
 
         const columnName = getColumnDisplayName(colId);
         let contentHtml: string;

@@ -49407,7 +49407,7 @@ export type GetPokemonQueryVariables = Exact<{
 }>;
 
 
-export type GetPokemonQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'pokemon', id: number, name: string, pokemonstats: Array<{ __typename?: 'pokemonstat', base_stat: number, stat?: { __typename?: 'stat', id: number, name: string } | null | undefined }>, pokemontypes: Array<{ __typename?: 'pokemontype', type?: { __typename?: 'type', id: number, name: string } | null | undefined }>, pokemonmoves: Array<{ __typename?: 'pokemonmove', level: number, movelearnmethod?: { __typename?: 'movelearnmethod', name: string } | null | undefined, move?: { __typename?: 'move', id: number } | null | undefined }> }> };
+export type GetPokemonQuery = { __typename?: 'query_root', results: Array<{ __typename?: 'pokemon', id: number, name: string, sid?: number | null | undefined, pokemonstats: Array<{ __typename?: 'pokemonstat', base_stat: number, stat?: { __typename?: 'stat', id: number, name: string } | null | undefined }>, pokemontypes: Array<{ __typename?: 'pokemontype', type?: { __typename?: 'type', id: number, name: string } | null | undefined }>, pokemonmoves: Array<{ __typename?: 'pokemonmove', level: number, movelearnmethod?: { __typename?: 'movelearnmethod', name: string } | null | undefined, move?: { __typename?: 'move', id: number } | null | undefined }> }> };
 
 export type GetPokemonCountQueryVariables = Exact<{
   where?: InputMaybe<Pokemon_Bool_Exp>;
@@ -49505,6 +49505,7 @@ export const GetPokemonDocument = gql`
     where: {pokemonmoves: {versiongroup: {generation: {id: {_eq: $gen}}}}}
   ) {
     id
+    sid: pokemon_species_id
     name
     pokemonstats {
       base_stat

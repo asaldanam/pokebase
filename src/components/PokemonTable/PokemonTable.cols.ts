@@ -18,7 +18,7 @@ export function createPokemonTableCols(props: {
             pinned: true,
             sortable: false,
             headerName: '',
-            floatingFilter: false,
+            floatingFilter: true,
             headerComponent: LogoHeaderComponent,
             minWidth: 72,
             maxWidth: 72,
@@ -49,16 +49,17 @@ export function createPokemonTableCols(props: {
             }
         },
         {
-            field: 'id',
-            filter: false,
+            field: 'sid',
+            headerName: '#',
+            floatingFilter: true,
             maxWidth: 90,
             minWidth: 90,
             valueFormatter: ({ value }) => `#${value.toString().padStart(4, '0')}`,
             cellRenderer: ({ value }) => {
-                const id = `#${value.toString().padStart(4, '0')}`;
+                const sid = `#${value.toString().padStart(4, '0')}`;
                 const href = `https://pokemondb.net/pokedex/${value}`;
                 return /*html*/ `
-                    <a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-400 underline">${id}</a>
+                    <a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-400 underline">${sid}</a>
                 `;
             }
         },
@@ -66,7 +67,7 @@ export function createPokemonTableCols(props: {
             field: 'name',
             headerName: 'Name',
             filter: 'agTextColumnFilter',
-            floatingFilter: false,
+            floatingFilter: true,
             minWidth: 220,
             maxWidth: 220,
             valueFormatter: ({ value }) => value.charAt(0).toUpperCase() + value.slice(1)
@@ -101,7 +102,7 @@ export function createPokemonTableCols(props: {
         {
             field: 'types',
             filter: 'agTextColumnFilter',
-            floatingFilter: false,
+            floatingFilter: true,
             minWidth: 130,
             maxWidth: 130,
             valueFormatter: ({ value }) => {
@@ -166,7 +167,7 @@ export function createPokemonTableCols(props: {
             field: 'moves',
             filter: 'agTextColumnFilter',
             headerName: 'Search moves',
-            floatingFilter: false,
+            floatingFilter: true,
             valueFormatter: ({ context, value }) => {
                 const count = value.length;
                 return `${count} move${count !== 1 ? 's' : ''} total`;
@@ -189,7 +190,7 @@ export function createPokemonTableCols(props: {
                     headerName: 'Total',
                     // columnGroupShow: 'closed',
                     filter: 'agNumberColumnFilter',
-                    floatingFilter: false,
+                    floatingFilter: true,
                     minWidth: 180,
                     maxWidth: 180
                 },
@@ -200,7 +201,7 @@ export function createPokemonTableCols(props: {
                             headerName: `${stats[i]?.name || `Stat ${i}`}`,
                             columnGroupShow: 'open',
                             filter: 'agNumberColumnFilter',
-                            floatingFilter: false,
+                            floatingFilter: true,
                             minWidth: 120,
                             maxWidth: 120
                         } as ColDef<PokemonTableRow>)
@@ -221,7 +222,7 @@ const createEffectivenessColumn = (props: {
         headerName: `${name} ${category.charAt(0).toUpperCase() + category.slice(1)}`,
         filter: 'agTextColumnFilter',
         columnGroupShow: 'open',
-        floatingFilter: false,
+        floatingFilter: true,
         minWidth: 150,
         maxWidth: 150,
         //ordena por el número de tipos en esa categoría

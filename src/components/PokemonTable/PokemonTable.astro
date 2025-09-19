@@ -2,15 +2,14 @@
 
 ---
 
-<div class="h-full w-full flex flex-col">
-	<div id="PokemonTable" class="w-full flex-1"></div>
-	<div class="max-w-full px-3 border-t-2 border-slate-500" style="background: hsl(217, 0%, 17%);">
-		<div id="PokemonTableFilters" class="flex flex-wrap gap-1 overflow-x-auto"></div>
+<div class="h-dvh w-full">
+	<div id="PokemonTable" class="h-full w-full"></div>
+	<div class="absolute bottom-0 w-full max-w-full px-3 backdrop-blur-md">
+		<div id="PokemonTableFilters" class="flex flex-wrap gap-1 overflow-x-auto py-3"></div>
 	</div>
 </div>
 
 <script>
-	import { AdvancedFilterModule, MultiFilterModule, SetFilterModule, TreeDataModule } from '@lib/ag-grid-enterprise';
 	import {
 		ClientSideRowModelModule,
 		createGrid,
@@ -19,21 +18,16 @@
 		NumberFilterModule,
 		TextFilterModule,
 		ValidationModule,
-		type GridApi,
 		type FilterChangedEvent
 	} from 'ag-grid-community';
 	import { createPokemonTableCols } from './PokemonTable.cols';
-	import { getPokemonTableData } from './PokemonTable.data';
-	import { createPokemonTableTheme } from './PokemonTable.theme';
+	import { getPokemonTableColsData, getPokemonTableRowsData } from './PokemonTable.data';
 	import { createFilterPillsManager } from './PokemonTable.filters';
+	import { createPokemonTableTheme } from './PokemonTable.theme';
 
 	if (typeof window !== 'undefined') {
 		ModuleRegistry.registerModules([
 			ClientSideRowModelModule,
-			TreeDataModule,
-			AdvancedFilterModule,
-			MultiFilterModule,
-			SetFilterModule,
 			TextFilterModule,
 			NumberFilterModule,
 			DateFilterModule,
@@ -41,7 +35,7 @@
 		]);
 
 		const lang = navigator.language.split('-')[0] || 'en';
-		const { rows, stats, types } = await getPokemonTableData({ lang });
+		const { stats, types } = await getPokemonTableColsData({ lang });
 
 		// Crear el manager de filtros
 		const filterManager = createFilterPillsManager({ stats, types });
@@ -57,14 +51,17 @@
 			columnDefs: createPokemonTableCols({ lang, stats, types }),
 			defaultColDef: { flex: 1 },
 			rowHeight: 52,
-			headerHeight: 36,
-			rowData: rows,
+			headerHeight: 32,
+			rowData: [],
 			theme: createPokemonTableTheme({
 				mode: colorscheme.matches ? 'dark' : 'light'
 			}),
 			groupDefaultExpanded: -1,
 			onFilterChanged: onFilterChanged
 		});
+
+		const { rows } = await getPokemonTableRowsData({ lang });
+		grid.setGridOption('rowData', rows);
 
 		// Inicializar el manager de filtros
 		filterManager.init('PokemonTableFilters', grid);
@@ -90,6 +87,10 @@
 		margin-right: -0.75rem;
 		background: rgba(1, 1, 1, 0.05);
 		border-radius: 0.375rem;
+	}
+
+	.ag-header-cell.ag-floating-filter {
+		padding-left: 0 !important;
 	}
 
 	/* Estilos para los pills de filtros */

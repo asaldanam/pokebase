@@ -1,9 +1,9 @@
 import type { GetPokemonQuery, GetTypesQuery } from '../types/PokeApiTypes';
 import { PokemonTypes } from './PokemonTypes';
-import type { Stat } from './Stat';
 
 export class Pokemon {
     id!: number;
+    sid!: number;
     name!: string;
     types!: PokemonTypes;
     stats!: Record<string, number>;
@@ -24,6 +24,7 @@ export class Pokemon {
         return new Pokemon({
             id: pokemon.id,
             name: pokemon.name,
+            sid: pokemon.sid!,
             types: PokemonTypes.fromQuery({ pokemontypes: pokemon.pokemontypes, types: params.types }),
             stats: {
                 total: Object.values(stats).reduce((a, b) => a + b, 0), // total

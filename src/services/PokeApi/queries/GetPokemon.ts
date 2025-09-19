@@ -4,6 +4,7 @@ export const GetPokemon = gql`
     query GetPokemon($gen: Int = 9) {
         results: pokemon(where: { pokemonmoves: { versiongroup: { generation: { id: { _eq: $gen } } } } }) {
             id
+            sid: pokemon_species_id
             name
             pokemonstats {
                 base_stat
